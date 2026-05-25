@@ -1,5 +1,7 @@
 # Source / build inputs
-src/
+credentials/
+lib/
+nodes/
 tsconfig.json
 *.ts
 !dist/**/*.d.ts

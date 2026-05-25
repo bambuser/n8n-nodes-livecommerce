@@ -1,8 +1,12 @@
 import type {
   IAuthenticateGeneric,
+  ICredentialTestRequest,
   ICredentialType,
   INodeProperties,
 } from 'n8n-workflow';
+
+const REGION_ORIGIN_EXPRESSION =
+  '={{ ($credentials.baseUrl || "").replace(/\\/$/, "") || ($credentials.region === "us" ? "https://liveshopping-api-us.bambuser.com" : "https://liveshopping-api-eu.bambuser.com") }}';
 
 export class BambuserApi implements ICredentialType {
   name = 'bambuserApi';
@@ -35,8 +39,8 @@ export class BambuserApi implements ICredentialType {
       name: 'baseUrl',
       type: 'string',
       default: '',
-      placeholder: 'https://linoleum-api.web.app',
-      description: 'Leave empty to use the production URL for the selected region. Set BAMBUSER_API_BASE_URL in .env for a persistent override.',
+      placeholder: 'https://liveshopping-api-stage.bambuser.com',
+      description: 'Leave empty to use the production URL for the selected region. Set to a stage or local mock URL to override.',
     },
   ];
 
@@ -49,4 +53,11 @@ export class BambuserApi implements ICredentialType {
     },
   };
 
+  test: ICredentialTestRequest = {
+    request: {
+      baseURL: REGION_ORIGIN_EXPRESSION,
+      url: '/v1/shows',
+      qs: { limit: 1 },
+    },
+  };
 }

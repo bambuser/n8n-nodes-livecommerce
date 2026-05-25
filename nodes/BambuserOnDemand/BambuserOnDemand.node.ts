@@ -1,24 +1,15 @@
 import type {
-  ICredentialTestFunctions,
-  ICredentialsDecrypted,
   IDataObject,
   IExecuteFunctions,
   IHttpRequestMethods,
   IHttpRequestOptions,
-  INodeCredentialTestResult,
   INodeExecutionData,
   INodeType,
   INodeTypeDescription,
 } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 
-const ORIGIN_BY_REGION: Readonly<Record<string, string>> = {
-  eu: 'https://liveshopping-api-eu.bambuser.com',
-  us: 'https://liveshopping-api-us.bambuser.com',
-};
-
-const resolveOrigin = (baseUrl: string, region: string): string =>
-  (process.env.BAMBUSER_API_BASE_URL || baseUrl || ORIGIN_BY_REGION[region] || ORIGIN_BY_REGION.eu).replace(/\/$/, '');
+import { resolveOrigin } from '../../lib/resolveOrigin';
 
 type VideoOp = 'get' | 'getMany' | 'create' | 'update' | 'delete' | 'query' | 'getCount' | 'getViewsCount' | 'clip' | 'updatePreview';
 type MediaAssetOp = 'get' | 'getMany' | 'create' | 'update' | 'delete' | 'createUploadTicket' | 'updateUploadStatus' | 'getCaptions' | 'createCaption' | 'updateCaption' | 'deleteCaption';
@@ -146,7 +137,7 @@ const buildOperationHandlers = (
     },
   }),
 
-  'video:getViewsCount': async (_i) => ({
+  'video:getViewsCount': async () => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/videos/views-count`,
   }),
@@ -228,7 +219,7 @@ const buildOperationHandlers = (
     url: `${baseUrl}/media-assets/${ctx.getNodeParameter('mediaAssetId', i) as string}`,
   }),
 
-  'mediaAsset:createUploadTicket': async (_i) => ({
+  'mediaAsset:createUploadTicket': async () => ({
     method: 'POST' as IHttpRequestMethods,
     url: `${baseUrl}/image-upload-ticket`,
     headers: { 'Content-Type': 'application/json' },
@@ -329,7 +320,7 @@ export class BambuserOnDemand implements INodeType {
     defaults: { name: 'Bambuser On Demand' },
     inputs: ['main'],
     outputs: ['main'],
-    credentials: [{ name: 'bambuserApi', required: true, testedBy: 'bambuserApiTest' }],
+    credentials: [{ name: 'bambuserApi', required: true }],
     properties: [
       // ── Resource ──────────────────────────────────────────────────────────
       {
@@ -353,15 +344,15 @@ export class BambuserOnDemand implements INodeType {
         noDataExpression: true,
         displayOptions: { show: { resource: ['video'] } },
         options: [
-          { name: 'Get', value: 'get', action: 'Get a video by ID' },
-          { name: 'Get Many', value: 'getMany', action: 'List videos' },
-          { name: 'Create', value: 'create', action: 'Create a video' },
-          { name: 'Update', value: 'update', action: 'Update a video' },
-          { name: 'Delete', value: 'delete', action: 'Delete a video' },
-          { name: 'Query', value: 'query', action: 'Query videos with filters' },
-          { name: 'Get Count', value: 'getCount', action: 'Get total video count' },
-          { name: 'Get Views Count', value: 'getViewsCount', action: 'Get total views count for the org' },
           { name: 'Clip', value: 'clip', action: 'Create a clip from a broadcast' },
+          { name: 'Create', value: 'create', action: 'Create a video' },
+          { name: 'Delete', value: 'delete', action: 'Delete a video' },
+          { name: 'Get', value: 'get', action: 'Get a video by ID' },
+          { name: 'Get Count', value: 'getCount', action: 'Get total video count' },
+          { name: 'Get Many', value: 'getMany', action: 'List videos' },
+          { name: 'Get Views Count', value: 'getViewsCount', action: 'Get total views count for the org' },
+          { name: 'Query', value: 'query', action: 'Query videos with filters' },
+          { name: 'Update', value: 'update', action: 'Update a video' },
           { name: 'Update Preview', value: 'updatePreview', action: 'Update the preview image of a video' },
         ],
         default: 'getMany',
@@ -373,17 +364,17 @@ export class BambuserOnDemand implements INodeType {
         noDataExpression: true,
         displayOptions: { show: { resource: ['mediaAsset'] } },
         options: [
-          { name: 'Get', value: 'get', action: 'Get a media asset by ID' },
-          { name: 'Get Many', value: 'getMany', action: 'List media assets' },
           { name: 'Create', value: 'create', action: 'Create a media asset' },
-          { name: 'Update', value: 'update', action: 'Update a media asset' },
-          { name: 'Delete', value: 'delete', action: 'Delete a media asset' },
-          { name: 'Create Upload Ticket', value: 'createUploadTicket', action: 'Get a ticket to upload an image' },
-          { name: 'Update Upload Status', value: 'updateUploadStatus', action: 'Report upload progress or completion' },
-          { name: 'Get Captions', value: 'getCaptions', action: 'List captions for a media asset' },
           { name: 'Create Caption', value: 'createCaption', action: 'Trigger transcription for a language' },
-          { name: 'Update Caption', value: 'updateCaption', action: 'Update caption content' },
+          { name: 'Create Upload Ticket', value: 'createUploadTicket', action: 'Get a ticket to upload an image' },
+          { name: 'Delete', value: 'delete', action: 'Delete a media asset' },
           { name: 'Delete Caption', value: 'deleteCaption', action: 'Delete a caption track' },
+          { name: 'Get', value: 'get', action: 'Get a media asset by ID' },
+          { name: 'Get Captions', value: 'getCaptions', action: 'List captions for a media asset' },
+          { name: 'Get Many', value: 'getMany', action: 'List media assets' },
+          { name: 'Update', value: 'update', action: 'Update a media asset' },
+          { name: 'Update Caption', value: 'updateCaption', action: 'Update caption content' },
+          { name: 'Update Upload Status', value: 'updateUploadStatus', action: 'Report upload progress or completion' },
         ],
         default: 'getMany',
       },
@@ -394,11 +385,11 @@ export class BambuserOnDemand implements INodeType {
         noDataExpression: true,
         displayOptions: { show: { resource: ['videoPlaylist'] } },
         options: [
+          { name: 'Create', value: 'create', action: 'Create a playlist' },
+          { name: 'Delete', value: 'delete', action: 'Delete a playlist' },
           { name: 'Get', value: 'get', action: 'Get a playlist by ID' },
           { name: 'Get Many', value: 'getMany', action: 'List playlists' },
-          { name: 'Create', value: 'create', action: 'Create a playlist' },
           { name: 'Update', value: 'update', action: 'Update a playlist' },
-          { name: 'Delete', value: 'delete', action: 'Delete a playlist' },
         ],
         default: 'getMany',
       },
@@ -574,7 +565,7 @@ export class BambuserOnDemand implements INodeType {
         displayOptions: { show: { resource: ['video'], operation: ['clip'] } },
       },
       {
-        displayName: 'Start (seconds)',
+        displayName: 'Start (Seconds)',
         name: 'clipStart',
         type: 'number',
         required: true,
@@ -582,7 +573,7 @@ export class BambuserOnDemand implements INodeType {
         displayOptions: { show: { resource: ['video'], operation: ['clip'] } },
       },
       {
-        displayName: 'End (seconds)',
+        displayName: 'End (Seconds)',
         name: 'clipEnd',
         type: 'number',
         required: true,
@@ -645,11 +636,11 @@ export class BambuserOnDemand implements INodeType {
         name: 'uploadState',
         type: 'options',
         options: [
-          { name: 'Uploading', value: 'uploading' },
-          { name: 'Created', value: 'created' },
-          { name: 'Waiting', value: 'waiting' },
-          { name: 'Processing', value: 'processing' },
           { name: 'Completed', value: 'completed' },
+          { name: 'Created', value: 'created' },
+          { name: 'Processing', value: 'processing' },
+          { name: 'Uploading', value: 'uploading' },
+          { name: 'Waiting', value: 'waiting' },
         ],
         default: 'completed',
         displayOptions: { show: { resource: ['mediaAsset'], operation: ['updateUploadStatus'] } },
@@ -744,46 +735,7 @@ export class BambuserOnDemand implements INodeType {
         displayOptions: { show: { resource: ['videoPlaylist'], operation: ['create', 'update'] } },
       },
     ],
-  };
-
-  methods = {
-    credentialTest: {
-      async bambuserApiTest(
-        this: ICredentialTestFunctions,
-        credential: ICredentialsDecrypted,
-      ): Promise<INodeCredentialTestResult> {
-        const { apiKey, region, baseUrl } = credential.data as {
-          apiKey: string;
-          region: string;
-          baseUrl?: string;
-        };
-        const origin = resolveOrigin(baseUrl ?? '', region);
-
-        return this.helpers
-          .request({
-            method: 'GET',
-            uri: `${origin}/v1/shows`,
-            qs: { limit: 1 },
-            headers: { Authorization: `Token ${apiKey}` },
-            json: true,
-          })
-          .then(() => ({ status: 'OK' as const, message: `Connected to ${origin}` }))
-          .catch((error: unknown) => {
-            const err = error as { statusCode?: number; error?: unknown };
-            if (err.statusCode === 403) {
-              return { status: 'OK' as const, message: `Connected to ${origin} (key valid, limited scope)` };
-            }
-            const body = err.error;
-            const detail = body
-              ? (typeof body === 'string' ? body : JSON.stringify(body))
-              : String(error);
-            return {
-              status: 'Error' as const,
-              message: `${origin} — HTTP ${err.statusCode ?? 'connection error'}: ${detail}`,
-            };
-          });
-      },
-    },
+		usableAsTool: true,
   };
 
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {

@@ -1,11 +1,8 @@
 import type {
-  ICredentialTestFunctions,
-  ICredentialsDecrypted,
   IDataObject,
   IExecuteFunctions,
   IHttpRequestMethods,
   IHttpRequestOptions,
-  INodeCredentialTestResult,
   INodeExecutionData,
   INodeType,
   INodeTypeDescription,
@@ -72,7 +69,7 @@ export class BambuserShopperData implements INodeType {
     defaults: { name: 'Bambuser Shopper Data' },
     inputs: ['main'],
     outputs: ['main'],
-    credentials: [{ name: 'bambuserApi', required: true, testedBy: 'bambuserApiTest' }],
+    credentials: [{ name: 'bambuserApi', required: true }],
     properties: [
       // ── Resource ───────────────────────────────────────────────────────────
       {
@@ -95,7 +92,7 @@ export class BambuserShopperData implements INodeType {
         displayOptions: { show: { resource: ['shopperData'] } },
         options: [
           { name: 'Delete', value: 'delete', action: 'Delete a shopper data record by ID' },
-          { name: 'Delete by Filter', value: 'deleteByFilter', action: 'Delete shopper data records matching a filter (GDPR erasure)' },
+          { name: 'Delete by Filter', value: 'deleteByFilter', action: 'Delete shopper data records matching a filter gdpr erasure' },
           { name: 'Get', value: 'get', action: 'Get a shopper data record by ID' },
           { name: 'Get Many', value: 'getMany', action: 'List shopper data records' },
         ],
@@ -117,8 +114,9 @@ export class BambuserShopperData implements INodeType {
         displayName: 'Limit',
         name: 'limit',
         type: 'number',
+								description: 'Max number of results to return',
         typeOptions: { minValue: 1, maxValue: 100 },
-        default: 25,
+        default: 50,
         displayOptions: { show: { resource: ['shopperData'], operation: ['getMany'] } },
       },
       {
@@ -173,46 +171,7 @@ export class BambuserShopperData implements INodeType {
         displayOptions: { show: { resource: ['shopperData'], operation: ['getMany', 'deleteByFilter'] } },
       },
     ],
-  };
-
-  methods = {
-    credentialTest: {
-      async bambuserApiTest(
-        this: ICredentialTestFunctions,
-        credential: ICredentialsDecrypted,
-      ): Promise<INodeCredentialTestResult> {
-        const { apiKey, region, baseUrl } = credential.data as {
-          apiKey: string;
-          region: string;
-          baseUrl?: string;
-        };
-        const origin = resolveOrigin(baseUrl ?? '', region);
-
-        return this.helpers
-          .request({
-            method: 'GET',
-            uri: `${origin}/v1/shows`,
-            qs: { limit: 1 },
-            headers: { Authorization: `Token ${apiKey}` },
-            json: true,
-          })
-          .then(() => ({ status: 'OK' as const, message: `Connected to ${origin}` }))
-          .catch((error: unknown) => {
-            const err = error as { statusCode?: number; error?: unknown };
-            if (err.statusCode === 403) {
-              return { status: 'OK' as const, message: `Connected to ${origin} (key valid, limited scope)` };
-            }
-            const body = err.error;
-            const detail = body
-              ? (typeof body === 'string' ? body : JSON.stringify(body))
-              : String(error);
-            return {
-              status: 'Error' as const,
-              message: `${origin} — HTTP ${err.statusCode ?? 'connection error'}: ${detail}`,
-            };
-          });
-      },
-    },
+		usableAsTool: true,
   };
 
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {

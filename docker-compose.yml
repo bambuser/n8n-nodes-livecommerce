@@ -18,13 +18,12 @@ services:
       N8N_PROTOCOL: ${N8N_PROTOCOL:-http}
       WEBHOOK_URL: ${WEBHOOK_URL:-http://localhost:5678/}
       NODE_OPTIONS: "--experimental-strip-types"
-      BAMBUSER_API_BASE_URL: ${BAMBUSER_API_BASE_URL:-}
       N8N_LOG_LEVEL: ${N8N_LOG_LEVEL:-debug}
     volumes:
       - n8n_data:/home/node/.n8n
       # Mount source live so saves on the host are immediately visible inside the container.
       # --watch then detects the change and restarts n8n automatically.
-      - ./nodes/dist:/home/node/custom/n8n-nodes-bambuser
+      - ./dist:/home/node/custom/n8n-nodes-bambuser
     depends_on:
       postgres:
         condition: service_healthy

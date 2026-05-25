@@ -1,11 +1,8 @@
 import type {
-  ICredentialTestFunctions,
-  ICredentialsDecrypted,
   IDataObject,
   IExecuteFunctions,
   IHttpRequestMethods,
   IHttpRequestOptions,
-  INodeCredentialTestResult,
   INodeExecutionData,
   INodeType,
   INodeTypeDescription,
@@ -130,7 +127,7 @@ export class BambuserOneToOne implements INodeType {
     defaults: { name: 'Bambuser One-to-One' },
     inputs: ['main'],
     outputs: ['main'],
-    credentials: [{ name: 'bambuserApi', required: true, testedBy: 'bambuserApiTest' }],
+    credentials: [{ name: 'bambuserApi', required: true }],
     properties: [
       // ── Resource ───────────────────────────────────────────────────────────
       {
@@ -141,7 +138,7 @@ export class BambuserOneToOne implements INodeType {
         options: [
           { name: 'Call', value: 'call' },
           { name: 'Connect Link', value: 'connectLink' },
-          { name: 'Stats', value: 'stats' },
+          { name: 'Stat', value: 'stats' },
         ],
         default: 'call',
       },
@@ -235,8 +232,8 @@ export class BambuserOneToOne implements INodeType {
         type: 'string',
         required: true,
         default: '{}',
-        placeholder: '{"externalId": "my-id", "title": "My Link", "validTo": "2024-12-31T23:59:59Z"}',
-        description: 'JSON body. Supported fields: externalId, title, validFrom, validTo, firstName, lastName, email, queue',
+        placeholder: '{"externalId": "my-ID", "title": "My Link", "validTo": "2024-12-31T23:59:59Z"}',
+        description: 'JSON body. Supported fields: externalId, title, validFrom, validTo, firstName, lastName, email, queue.',
         typeOptions: { rows: 3 },
         displayOptions: { show: { resource: ['connectLink'], operation: ['create'] } },
       },
@@ -249,7 +246,7 @@ export class BambuserOneToOne implements INodeType {
         required: true,
         default: '{}',
         placeholder: '{"title": "New Title", "validTo": "2024-12-31T23:59:59Z"}',
-        description: 'JSON object with fields to update. Supported fields: title, validFrom, validTo, firstName, lastName, email, queue',
+        description: 'JSON object with fields to update. Supported fields: title, validFrom, validTo, firstName, lastName, email, queue.',
         typeOptions: { rows: 3 },
         displayOptions: { show: { resource: ['connectLink'], operation: ['update', 'updateByExternalId'] } },
       },
@@ -322,46 +319,7 @@ export class BambuserOneToOne implements INodeType {
         displayOptions: { show: { resource: ['stats'], operation: ['getMissed'] } },
       },
     ],
-  };
-
-  methods = {
-    credentialTest: {
-      async bambuserApiTest(
-        this: ICredentialTestFunctions,
-        credential: ICredentialsDecrypted,
-      ): Promise<INodeCredentialTestResult> {
-        const { apiKey, region, baseUrl } = credential.data as {
-          apiKey: string;
-          region: string;
-          baseUrl?: string;
-        };
-        const origin = resolveOrigin(baseUrl ?? '', region);
-
-        return this.helpers
-          .request({
-            method: 'GET',
-            uri: `${origin}/v1/shows`,
-            qs: { limit: 1 },
-            headers: { Authorization: `Token ${apiKey}` },
-            json: true,
-          })
-          .then(() => ({ status: 'OK' as const, message: `Connected to ${origin}` }))
-          .catch((error: unknown) => {
-            const err = error as { statusCode?: number; error?: unknown };
-            if (err.statusCode === 403) {
-              return { status: 'OK' as const, message: `Connected to ${origin} (key valid, limited scope)` };
-            }
-            const body = err.error;
-            const detail = body
-              ? (typeof body === 'string' ? body : JSON.stringify(body))
-              : String(error);
-            return {
-              status: 'Error' as const,
-              message: `${origin} — HTTP ${err.statusCode ?? 'connection error'}: ${detail}`,
-            };
-          });
-      },
-    },
+		usableAsTool: true,
   };
 
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {

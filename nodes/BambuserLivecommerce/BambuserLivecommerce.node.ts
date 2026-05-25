@@ -1,11 +1,8 @@
 import type {
-  ICredentialTestFunctions,
-  ICredentialsDecrypted,
   IDataObject,
   IExecuteFunctions,
   IHttpRequestMethods,
   IHttpRequestOptions,
-  INodeCredentialTestResult,
   INodeExecutionData,
   INodeType,
   INodeTypeDescription,
@@ -571,7 +568,7 @@ export class BambuserLivecommerce implements INodeType {
     defaults: { name: 'Bambuser Live Commerce' },
     inputs: ['main'],
     outputs: ['main'],
-    credentials: [{ name: 'bambuserApi', required: true, testedBy: 'bambuserApiTest' }],
+    credentials: [{ name: 'bambuserApi', required: true }],
     properties: [
       // ── Resource ───────────────────────────────────────────────────────────
       {
@@ -584,7 +581,7 @@ export class BambuserLivecommerce implements INodeType {
           { name: 'Channel', value: 'channel' },
           { name: 'Product', value: 'product' },
           { name: 'Show', value: 'show' },
-          { name: 'Stats', value: 'stats' },
+          { name: 'Stat', value: 'stats' },
           { name: 'Tag', value: 'tag' },
           { name: 'User', value: 'user' },
           { name: 'Webhook', value: 'webhook' },
@@ -641,8 +638,8 @@ export class BambuserLivecommerce implements INodeType {
           { name: 'Reorder Products', value: 'reorderProducts', action: 'Reorder products in a show' },
           { name: 'Send Chat Message', value: 'sendChatMessage', action: 'Send a chat message to a show' },
           { name: 'Update', value: 'update', action: 'Update a show' },
-          { name: 'Update Chat Message', value: 'updateChatMessage', action: 'Update a chat message status' },
           { name: 'Update Channels', value: 'updateChannels', action: 'Replace all channels on a show' },
+          { name: 'Update Chat Message', value: 'updateChatMessage', action: 'Update a chat message status' },
           { name: 'Update Highlight', value: 'updateHighlight', action: 'Update highlight products' },
           { name: 'Update Pinned Comment', value: 'updatePinnedComment', action: 'Update a pinned comment' },
           { name: 'Update Tags', value: 'updateTags', action: 'Replace all tags on a show' },
@@ -1003,6 +1000,7 @@ export class BambuserLivecommerce implements INodeType {
         displayName: 'Limit',
         name: 'limit',
         type: 'number',
+								description: 'Max number of results to return',
         typeOptions: { minValue: 1, maxValue: 100 },
         default: 50,
         displayOptions: {
@@ -1063,10 +1061,10 @@ export class BambuserLivecommerce implements INodeType {
         type: 'options',
         options: [
           { name: 'All', value: '' },
-          { name: 'Upcoming', value: 'upcoming' },
+          { name: 'Ended', value: 'ended' },
           { name: 'Live', value: 'live' },
           { name: 'Scheduled', value: 'scheduled' },
-          { name: 'Ended', value: 'ended' },
+          { name: 'Upcoming', value: 'upcoming' },
         ],
         default: '',
         displayOptions: { show: { resource: ['show'], operation: ['getMany'] } },
@@ -1125,24 +1123,58 @@ export class BambuserLivecommerce implements INodeType {
             displayName: 'Values',
             name: 'values',
             values: [
-              { displayName: 'Scheduled Start At', name: 'scheduledStartAt', type: 'string', default: '', placeholder: '2024-06-01T10:00:00Z' },
-              { displayName: 'Description', name: 'description', type: 'string', default: '' },
-              {
-                displayName: 'Published',
-                name: 'published',
-                type: 'options',
-                options: [{ name: 'True', value: 'true' }, { name: 'False', value: 'false' }],
-                default: 'true',
-              },
-              {
-                displayName: 'Allow Archived Playback',
-                name: 'allowArchivedPlayback',
-                type: 'options',
-                options: [{ name: 'True', value: 'true' }, { name: 'False', value: 'false' }],
-                default: 'true',
-              },
-              { displayName: 'Is Test Show', name: 'isTestShow', type: 'boolean', default: false },
-            ],
+											{
+												displayName: 'Allow Archived Playback',
+												name: 'allowArchivedPlayback',
+												type: 'options',
+												options: [
+													{
+														name: 'True',
+														value: 'true',
+													},
+													{
+														name: 'False',
+														value: 'false',
+													},
+												],
+												default: 'true',
+											},
+											{
+												displayName: 'Description',
+												name: 'description',
+												type: 'string',
+												default: '',
+											},
+											{
+												displayName: 'Is Test Show',
+												name: 'isTestShow',
+												type: 'boolean',
+												default: false,
+											},
+											{
+												displayName: 'Published',
+												name: 'published',
+												type: 'options',
+												options: [
+													{
+														name: 'True',
+														value: 'true',
+													},
+													{
+														name: 'False',
+														value: 'false',
+													},
+													],
+												default: 'true',
+											},
+											{
+												displayName: 'Scheduled Start At',
+												name: 'scheduledStartAt',
+												type: 'string',
+												default: '',
+												placeholder: '2024-06-01T10:00:00Z',
+											},
+									],
           },
         ],
       },
@@ -1160,24 +1192,66 @@ export class BambuserLivecommerce implements INodeType {
             displayName: 'Values',
             name: 'values',
             values: [
-              { displayName: 'Title', name: 'title', type: 'string', default: '' },
-              { displayName: 'Description', name: 'description', type: 'string', default: '' },
-              { displayName: 'Scheduled Start At', name: 'scheduledStartAt', type: 'string', default: '', placeholder: '2024-06-01T10:00:00Z' },
-              {
-                displayName: 'Published',
-                name: 'published',
-                type: 'options',
-                options: [{ name: '— No Change —', value: '' }, { name: 'True', value: 'true' }, { name: 'False', value: 'false' }],
-                default: '',
-              },
-              {
-                displayName: 'Allow Archived Playback',
-                name: 'allowArchivedPlayback',
-                type: 'options',
-                options: [{ name: '— No Change —', value: '' }, { name: 'True', value: 'true' }, { name: 'False', value: 'false' }],
-                default: '',
-              },
-            ],
+											{
+												displayName: 'Allow Archived Playback',
+												name: 'allowArchivedPlayback',
+												type: 'options',
+												options: [
+													{
+														name: '—	No Change	—',
+														value: '',
+													},
+													{
+														name: 'True',
+														value: 'true',
+													},
+													{
+														name: 'False',
+														value: 'false',
+													},
+												],
+												default: '',
+											},
+											{
+												displayName: 'Description',
+												name: 'description',
+												type: 'string',
+												default: '',
+											},
+											{
+												displayName: 'Published',
+												name: 'published',
+												type: 'options',
+												options: [
+													{
+														name: '—	No Change	—',
+														value: '',
+													},
+													{
+														name: 'True',
+														value: 'true',
+													},
+													{
+														name: 'False',
+														value: 'false',
+													},
+													],
+												default: '',
+											},
+											{
+												displayName: 'Scheduled Start At',
+												name: 'scheduledStartAt',
+												type: 'string',
+												default: '',
+												placeholder: '2024-06-01T10:00:00Z',
+											},
+											{
+												displayName: 'Title',
+												name: 'title',
+												type: 'string',
+												default: '',
+											},
+									],
           },
         ],
       },
@@ -1219,7 +1293,7 @@ export class BambuserLivecommerce implements INodeType {
             values: [
               { displayName: 'Display Name', name: 'displayName', type: 'string', default: '' },
               { displayName: 'Full Name', name: 'fullName', type: 'string', default: '' },
-              { displayName: 'Roles (comma-separated)', name: 'roles', type: 'string', default: '', placeholder: 'admin,host' },
+              { displayName: 'Roles (Comma-Separated)', name: 'roles', type: 'string', default: '', placeholder: 'admin,host' },
               { displayName: 'External Reference ID', name: 'externalReferenceId', type: 'string', default: '' },
             ],
           },
@@ -1292,7 +1366,7 @@ export class BambuserLivecommerce implements INodeType {
         displayOptions: { show: { resource: ['show'], operation: ['addHighlight', 'updateHighlight'] } },
       },
       {
-        displayName: 'Start Relative (seconds)',
+        displayName: 'Start Relative (Seconds)',
         name: 'startRel',
         type: 'number',
         default: '',
@@ -1401,6 +1475,7 @@ export class BambuserLivecommerce implements INodeType {
         displayName: 'Email',
         name: 'email',
         type: 'string',
+								placeholder: 'name@email.com',
         default: '',
         displayOptions: { show: { resource: ['user'], operation: ['getMany'] } },
       },
@@ -1417,6 +1492,7 @@ export class BambuserLivecommerce implements INodeType {
         displayName: 'Email',
         name: 'email',
         type: 'string',
+								placeholder: 'name@email.com',
         required: true,
         default: '',
         displayOptions: { show: { resource: ['user'], operation: ['invite'] } },
@@ -1490,46 +1566,7 @@ export class BambuserLivecommerce implements INodeType {
         displayOptions: { show: { resource: ['webhook'], operation: ['create'] } },
       },
     ],
-  };
-
-  methods = {
-    credentialTest: {
-      async bambuserApiTest(
-        this: ICredentialTestFunctions,
-        credential: ICredentialsDecrypted,
-      ): Promise<INodeCredentialTestResult> {
-        const { apiKey, region, baseUrl } = credential.data as {
-          apiKey: string;
-          region: string;
-          baseUrl?: string;
-        };
-        const origin = resolveOrigin(baseUrl ?? '', region);
-
-        return this.helpers
-          .request({
-            method: 'GET',
-            uri: `${origin}/v1/shows`,
-            qs: { limit: 1 },
-            headers: { Authorization: `Token ${apiKey}` },
-            json: true,
-          })
-          .then(() => ({ status: 'OK' as const, message: `Connected to ${origin}` }))
-          .catch((error: unknown) => {
-            const err = error as { statusCode?: number; error?: unknown };
-            if (err.statusCode === 403) {
-              return { status: 'OK' as const, message: `Connected to ${origin} (key valid, limited scope)` };
-            }
-            const body = err.error;
-            const detail = body
-              ? (typeof body === 'string' ? body : JSON.stringify(body))
-              : String(error);
-            return {
-              status: 'Error' as const,
-              message: `${origin} — HTTP ${err.statusCode ?? 'connection error'}: ${detail}`,
-            };
-          });
-      },
-    },
+		usableAsTool: true,
   };
 
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {

@@ -1,11 +1,8 @@
 import type {
-  ICredentialTestFunctions,
-  ICredentialsDecrypted,
   IDataObject,
   IExecuteFunctions,
   IHttpRequestMethods,
   IHttpRequestOptions,
-  INodeCredentialTestResult,
   INodeExecutionData,
   INodeType,
   INodeTypeDescription,
@@ -88,7 +85,7 @@ export class BambuserProductCatalog implements INodeType {
     defaults: { name: 'Bambuser Product Catalog' },
     inputs: ['main'],
     outputs: ['main'],
-    credentials: [{ name: 'bambuserApi', required: true, testedBy: 'bambuserApiTest' }],
+    credentials: [{ name: 'bambuserApi', required: true }],
     properties: [
       // ── Resource ───────────────────────────────────────────────────────────
       {
@@ -151,8 +148,9 @@ export class BambuserProductCatalog implements INodeType {
         displayName: 'Limit',
         name: 'limit',
         type: 'number',
+								description: 'Max number of results to return',
         typeOptions: { minValue: 1, maxValue: 1000 },
-        default: 10,
+        default: 50,
         displayOptions: { show: { resource: ['product'], operation: ['search'] } },
       },
       {
@@ -213,7 +211,7 @@ export class BambuserProductCatalog implements INodeType {
         required: true,
         default: '{}',
         placeholder: '{"title": "My Product", "uri": "https://example.com/product"}',
-        description: 'JSON object representing the product. Required fields for create: title, uri',
+        description: 'JSON object representing the product. Required fields for create: title, uri.',
         typeOptions: { rows: 4 },
         displayOptions: { show: { resource: ['product'], operation: ['create'] } },
       },
@@ -229,46 +227,7 @@ export class BambuserProductCatalog implements INodeType {
         displayOptions: { show: { resource: ['product'], operation: ['update'] } },
       },
     ],
-  };
-
-  methods = {
-    credentialTest: {
-      async bambuserApiTest(
-        this: ICredentialTestFunctions,
-        credential: ICredentialsDecrypted,
-      ): Promise<INodeCredentialTestResult> {
-        const { apiKey, region, baseUrl } = credential.data as {
-          apiKey: string;
-          region: string;
-          baseUrl?: string;
-        };
-        const origin = resolveOrigin(baseUrl ?? '', region);
-
-        return this.helpers
-          .request({
-            method: 'GET',
-            uri: `${origin}/v1/shows`,
-            qs: { limit: 1 },
-            headers: { Authorization: `Token ${apiKey}` },
-            json: true,
-          })
-          .then(() => ({ status: 'OK' as const, message: `Connected to ${origin}` }))
-          .catch((error: unknown) => {
-            const err = error as { statusCode?: number; error?: unknown };
-            if (err.statusCode === 403) {
-              return { status: 'OK' as const, message: `Connected to ${origin} (key valid, limited scope)` };
-            }
-            const body = err.error;
-            const detail = body
-              ? (typeof body === 'string' ? body : JSON.stringify(body))
-              : String(error);
-            return {
-              status: 'Error' as const,
-              message: `${origin} — HTTP ${err.statusCode ?? 'connection error'}: ${detail}`,
-            };
-          });
-      },
-    },
+		usableAsTool: true,
   };
 
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {

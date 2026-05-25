@@ -4,4 +4,4 @@ const ORIGIN_BY_REGION: Readonly<Record<string, string>> = {
 };
 
 export const resolveOrigin = (baseUrl: string, region: string): string =>
-  (baseUrl || process.env.BAMBUSER_API_BASE_URL || ORIGIN_BY_REGION[region] || ORIGIN_BY_REGION.eu).replace(/\/$/, '');
+  (baseUrl || ORIGIN_BY_REGION[region] || ORIGIN_BY_REGION.eu).replace(/\/$/, '');

@@ -12,10 +12,6 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-defaults:
-  run:
-    working-directory: nodes
-
 jobs:
   build:
     name: Lint, test, and build
@@ -29,7 +25,7 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: npm
-          cache-dependency-path: nodes/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci

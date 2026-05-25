@@ -119,7 +119,7 @@ Ready-to-import workflow JSON files live under [`examples/workflows/`](./example
 
 ```bash
 git clone https://github.com/bambuser/n8n-nodes-livecommerce.git
-cd n8n-nodes-livecommerce/nodes
+cd n8n-nodes-livecommerce
 nvm use        # picks up .nvmrc → Node 24
 npm install
 npm run build
@@ -129,7 +129,7 @@ To link the local build into a local n8n install:
 
 ```bash
 cd ~/.n8n/custom
-npm link /absolute/path/to/n8n-nodes-livecommerce/nodes
+npm link /absolute/path/to/n8n-nodes-livecommerce
 ```
 
 Restart n8n and the nodes load from the local build directory.
@@ -146,10 +146,10 @@ docker compose up --build
 
 n8n is available at `http://localhost:5678`.
 
-After editing anything under `nodes/src/`:
+After editing anything under `credentials/`, `lib/`, or `nodes/`:
 
 ```bash
-cd nodes && npm run build
+npm run build
 docker compose restart n8n
 ```
 
@@ -167,7 +167,7 @@ The tunnel URL changes on every restart. To push the new URL to Bambuser, deacti
 
 Releases are tag-driven and run from GitHub Actions with npm provenance.
 
-1. A maintainer runs `npm run release` from `nodes/`. [release-it](https://github.com/release-it/release-it) prompts for a version bump, updates `package.json`, commits, tags, and pushes the tag.
+1. A maintainer runs `npm run release` from the repo root. [release-it](https://github.com/release-it/release-it) prompts for a version bump, updates `package.json`, commits, tags, and pushes the tag.
 2. The tag push triggers `.github/workflows/publish.yml`, which builds the package and publishes it to npm under the `@bambuser` scope with an [npm provenance statement](https://docs.npmjs.com/generating-provenance-statements).
 
 Both Trusted Publishers (OIDC) and a long-lived `NPM_TOKEN` secret are supported. See the comments in `.github/workflows/publish.yml` for setup.

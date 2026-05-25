@@ -63,10 +63,6 @@ on:
       # See "TAG CONVENTION" above if you prefer tags with a "v" prefix.
       - '*.*.*'
 
-defaults:
-  run:
-    working-directory: nodes
-
 jobs:
   publish:
     name: Publish to npm
@@ -86,7 +82,7 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
-          cache-dependency-path: nodes/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci

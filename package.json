@@ -29,7 +29,9 @@
     "node": ">=24"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "publishConfig": {
     "access": "public"
@@ -40,7 +42,7 @@
     "dev": "n8n-node dev",
     "lint": "n8n-node lint",
     "lint:fix": "n8n-node lint --fix",
-    "test": "node --test \"src/**/*.test.ts\"",
+    "test": "node --test \"{credentials,lib,nodes}/**/*.test.ts\"",
     "release": "n8n-node release",
     "prepublishOnly": "n8n-node prerelease"
   },

@@ -10,13 +10,19 @@ RUN mkdir -p /home/node/.n8n /home/node/custom/n8n-nodes-bambuser \
 
 # Compile custom nodes to CommonJS so n8n's require()-based loader can pick them up
 WORKDIR /tmp/nodes-build
-COPY nodes/package.json nodes/tsconfig.json ./
+COPY package.json tsconfig.json ./
 RUN npm install
-COPY nodes/src ./src
+COPY credentials ./credentials
+COPY lib ./lib
+COPY nodes ./nodes
 RUN npx tsc --outDir /home/node/custom/n8n-nodes-bambuser && \
-    cp src/nodes/BambuserLivecommerce/bambuser-live.svg /home/node/custom/n8n-nodes-bambuser/nodes/BambuserLivecommerce/ && \
-    cp src/nodes/BambuserOnDemand/bambuser-vod.svg /home/node/custom/n8n-nodes-bambuser/nodes/BambuserOnDemand/ && \
-    cp src/nodes/BambuserWebhookTrigger/bambuser-webhook.svg /home/node/custom/n8n-nodes-bambuser/nodes/BambuserWebhookTrigger/
+    cp credentials/bambuser.svg /home/node/custom/n8n-nodes-bambuser/credentials/ && \
+    cp nodes/BambuserLivecommerce/bambuser-live.svg /home/node/custom/n8n-nodes-bambuser/nodes/BambuserLivecommerce/ && \
+    cp nodes/BambuserOnDemand/bambuser-vod.svg /home/node/custom/n8n-nodes-bambuser/nodes/BambuserOnDemand/ && \
+    cp nodes/BambuserOneToOne/bambuser-live.svg /home/node/custom/n8n-nodes-bambuser/nodes/BambuserOneToOne/ && \
+    cp nodes/BambuserProductCatalog/bambuser-vod.svg /home/node/custom/n8n-nodes-bambuser/nodes/BambuserProductCatalog/ && \
+    cp nodes/BambuserShopperData/bambuser-vod.svg /home/node/custom/n8n-nodes-bambuser/nodes/BambuserShopperData/ && \
+    cp nodes/BambuserWebhookTrigger/bambuser-webhook.svg /home/node/custom/n8n-nodes-bambuser/nodes/BambuserWebhookTrigger/
 
 RUN chown -R node:node /home/node/custom
 
