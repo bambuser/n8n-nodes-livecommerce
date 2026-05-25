@@ -1,0 +1,140 @@
+{
+  "results": [
+    {
+      "title": "My upcoming show!",
+      "id": "0WB2n43mpsIV2PX21d3j",
+      "orgId": "6tyBD86t32MPewDByicW",
+      "createdAt": "2019-03-13T10:10:11.000Z",
+      "scheduledStartAt": "2020-04-16T14:00:00.000Z",
+      "contributors": [
+        "dg12vbxm2sXerIaFELrxVQHsDwc2"
+      ],
+      "isTestShow": false,
+      "isLive": false,
+      "allowArchivedPlayback": true,
+      "published": true,
+      "channels": [],
+      "isArchived": true,
+      "description": "My super awesome show starring OsNoBe",
+      "state": "ended",
+      "products": [
+        "tpl:431d214f261b3220924ecb10231370bbf8626ea3"
+      ],
+      "tags": [
+        {
+          "id": "yzARiU806lUsg19ohOzh"
+        }
+      ],
+      "curtains": {
+        "pending": {
+          "backgroundImage": "https://storage.liveshopping.bambuser.com/test/image-pending.png"
+        },
+        "paused": {
+          "backgroundImage": "https://storage.liveshopping.bambuser.com/test/image-paused.png"
+        },
+        "ended": {
+          "backgroundImage": "https://storage.liveshopping.bambuser.com/test/image-ended.png"
+        }
+      },
+      "settings": {
+        "chatHideLive": true,
+        "chatHideArchived": true,
+        "autoRejectMessages": false,
+        "hidePlayerViewerCount": false,
+        "hideProductHighlightPrice": true,
+        "forceSmallChatContainer": false,
+        "closedCaptionsEnabled": true,
+        "audioDescriptionEnabled": true
+      }
+    },
+    {
+      "title": "My live show",
+      "id": "9P1WT6Nam2UlE058BrHG",
+      "orgId": "6tyBD86t32MPewDByicW",
+      "createdAt": "2019-12-23T10:00:00.000Z",
+      "scheduledStartAt": "2020-01-12T22:55:00.000Z",
+      "startedAt": "2020-01-12T22:56:00.000Z",
+      "preview": "http://example-domain/path/to/preview.png",
+      "contributors": [
+        "dg12vbxm2sXerIaFELrxVQHsDwc2"
+      ],
+      "isTestShow": false,
+      "isLive": true,
+      "allowArchivedPlayback": false,
+      "published": true,
+      "channels": [],
+      "isArchived": false,
+      "description": "My super awesome show starring OsNoBe",
+      "state": "live",
+      "products": [
+        "tpl:431d214f261b3220924ecb10231370bbf8626ea3"
+      ],
+      "tags": [
+        {
+          "id": "yzARiU806lUsg19ohOzh"
+        }
+      ],
+      "curtains": {
+        "pending": {
+          "backgroundImage": "https://storage.liveshopping.bambuser.com/test/image-pending.png"
+        },
+        "paused": {
+          "backgroundImage": "https://storage.liveshopping.bambuser.com/test/image-paused.png"
+        },
+        "ended": {
+          "backgroundImage": "https://storage.liveshopping.bambuser.com/test/image-ended.png"
+        }
+      },
+      "settings": {
+        "chatHideLive": false,
+        "chatHideArchived": false
+      }
+    },
+    {
+      "title": "My old show",
+      "id": "Dmfs2Uww2ilQvZx7MHqZ",
+      "orgId": "6tyBD86t32MPewDByicW",
+      "createdAt": "2019-12-11T10:00:00.000Z",
+      "scheduledStartAt": "2019-12-13T10:30:00.000Z",
+      "startedAt": "2019-12-13T10:31:45.000Z",
+      "endedAt": "2019-12-13T10:47:28.000Z",
+      "preview": "http://example-domain/path/to/preview.png",
+      "contributors": [
+        "dg12vbxm2sXerIaFELrxVQHsDwc2"
+      ],
+      "isTestShow": false,
+      "isLive": false,
+      "allowArchivedPlayback": true,
+      "published": true,
+      "channels": [],
+      "showLengthSeconds": 1337,
+      "isArchived": true,
+      "description": "My super awesome show starring OsNoBe",
+      "state": "ended",
+      "products": [
+        "tpl:431d214f261b3220924ecb10231370bbf8626ea3"
+      ],
+      "tags": [
+        {
+          "id": "yzARiU806lUsg19ohOzh"
+        }
+      ],
+      "curtains": {
+        "pending": {
+          "backgroundImage": "https://storage.liveshopping.bambuser.com/test/image-pending.png"
+        },
+        "paused": {
+          "backgroundImage": "https://storage.liveshopping.bambuser.com/test/image-paused.png"
+        },
+        "ended": {
+          "backgroundImage": "https://storage.liveshopping.bambuser.com/test/image-ended.png"
+        }
+      },
+      "settings": {
+        "hideProductHighlightPrice": true,
+        "forceSmallChatContainer": true
+      }
+    }
+  ],
+  "next": "t32MPe6tyBD86t32Me6tyBD86B86ByicD86t32MPew"
+}
