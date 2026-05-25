@@ -1,0 +1,211 @@
+{
+  "name": "On-Demand Description Auto-fill",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1,
+              "triggerAtHour": 10,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "list",
+        "limit": 50
+      },
+      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "List On-Demand Videos",
+      "type": "CUSTOM.bambuserOnDemand",
+      "typeVersion": 1,
+      "position": [
+        500,
+        300
+      ],
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "return $input.all().filter(item => {\n  const desc = item.json.description;\n  return desc === undefined || desc === null || desc === '' || (typeof desc === 'string' && desc.trim() === '');\n});"
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "name": "Filter Missing Descriptions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        750,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+      "name": "Process One at a Time",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1000,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": {
+          "mode": "id",
+          "value": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "user",
+              "content": "=Write a concise 2-sentence description for a live shopping on-demand video. Title: {{ $json.title }}. Tags: {{ Array.isArray($json.tags) ? $json.tags.join(', ') : ($json.tags || '') }}. Return only the description."
+            }
+          ]
+        },
+        "simplify": true,
+        "options": {
+          "maxOutputTokens": 150,
+          "temperature": 0.7
+        }
+      },
+      "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
+      "name": "Generate Description with Gemini",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        1250,
+        300
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "zWjTkBrecPDssM2x",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "update",
+        "videoId": "={{ $('Process One at a Time').item.json.id }}",
+        "videoBody": "={{ JSON.stringify({ description: $json.text }) }}"
+      },
+      "id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
+      "name": "Update Video Description",
+      "type": "CUSTOM.bambuserOnDemand",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        300
+      ],
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "List On-Demand Videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List On-Demand Videos": {
+      "main": [
+        [
+          {
+            "node": "Filter Missing Descriptions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Missing Descriptions": {
+      "main": [
+        [
+          {
+            "node": "Process One at a Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process One at a Time": {
+      "main": [
+        [
+          {
+            "node": "Generate Description with Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Description with Gemini": {
+      "main": [
+        [
+          {
+            "node": "Update Video Description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Video Description": {
+      "main": [
+        [
+          {
+            "node": "Process One at a Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "instanceId": "demo"
+  }
+}

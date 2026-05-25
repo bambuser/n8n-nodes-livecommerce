@@ -1,0 +1,227 @@
+{
+  "updatedAt": "2026-05-21T12:40:17.453Z",
+  "createdAt": "2026-05-21T12:30:09.485Z",
+  "id": "4R4qfpQSqVDsyIj1",
+  "name": "AI On-Demand Description Generator",
+  "description": "",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "387e6556-67da-48c8-b9ea-ee15e424357e",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        112,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "pageSize": 10
+      },
+      "id": "f3ea98be-f315-4919-a91c-5fc0c9c577f1",
+      "name": "Get Recent On-Demand Videos",
+      "type": "CUSTOM.bambuserOnDemand",
+      "typeVersion": 1,
+      "position": [
+        336,
+        304
+      ],
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst allVideos = response.data || [];\nconst video = allVideos.find(v => {\n  const details = v.videoDetails;\n  return !details || !details.length || !details[0]?.description;\n}) || allVideos[0];\nif (!video) return [];\nconst details = video.videoDetails?.[0] || {};\nconst title = details.title || video.filename || 'Untitled Show';\nreturn [{\n  json: {\n    videoId: video.id,\n    title,\n    prompt: `You are a content writer for a live shopping video platform.\n\nWrite an engaging description for an on-demand video titled \"${title}\".\nRequirements:\n- 2-3 sentences, max 280 characters\n- Highlight the live shopping experience\n- Encourage viewers to watch\nReturn ONLY the description text, nothing else.`\n  }\n}];"
+      },
+      "id": "15e02fc8-9013-4eb5-8635-98f899853e53",
+      "name": "Build Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "batching": {}
+      },
+      "id": "aae2fae1-ad7f-4970-bff7-1f6c545df614",
+      "name": "Generate On-Demand Metadata",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        784,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "id": "ec49a8c1-c1a2-43c4-bde2-f0723c60ab8d",
+      "name": "Gemini — Generate On-Demand Metadata",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        856,
+        528
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "zWjTkBrecPDssM2x",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ai = ($input.first().json.text || $input.first().json.output || '').trim();\nconst src = $('Build Prompt').first().json;\nreturn [{ json: { videoId: src.videoId, title: src.title, description: ai.slice(0, 280) } }];\n"
+      },
+      "id": "3ffbbf5c-5ddd-4586-bd8d-96f68e223175",
+      "name": "Parse Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "videoId": "={{ $json.videoId }}",
+        "title": "={{ $json.title }}",
+        "description": "={{ $json.description }}"
+      },
+      "id": "2ced56d2-54ed-45d7-b650-c49104276b1e",
+      "name": "Update On-Demand Video",
+      "type": "CUSTOM.bambuserOnDemand",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        304
+      ],
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gemini — Generate On-Demand Metadata": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate On-Demand Metadata",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Recent On-Demand Videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Recent On-Demand Videos": {
+      "main": [
+        [
+          {
+            "node": "Build Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Prompt": {
+      "main": [
+        [
+          {
+            "node": "Generate On-Demand Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate On-Demand Metadata": {
+      "main": [
+        [
+          {
+            "node": "Parse Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Response": {
+      "main": [
+        [
+          {
+            "node": "Update On-Demand Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "c01bd389-1757-431b-90d4-f3be333aa6ce",
+  "activeVersionId": null,
+  "versionCounter": 4,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-05-21T12:30:09.485Z",
+      "createdAt": "2026-05-21T12:30:09.485Z",
+      "role": "workflow:owner",
+      "workflowId": "4R4qfpQSqVDsyIj1",
+      "projectId": "uUVVHahY9DnkUBGI",
+      "project": {
+        "updatedAt": "2026-05-20T07:48:48.695Z",
+        "createdAt": "2026-05-20T07:45:46.154Z",
+        "id": "uUVVHahY9DnkUBGI",
+        "name": "Kristoffer Carlson <kristoffer.carlson@bambuser.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "ed732eea-2a2b-4cf0-8959-12366b69e7f0"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

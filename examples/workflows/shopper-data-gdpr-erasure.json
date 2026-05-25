@@ -1,0 +1,224 @@
+{
+  "name": "GDPR Shopper Data Erasure Pipeline",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Bambuser Webhook Trigger",
+      "type": "CUSTOM.bambuserWebhookTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "shopperData",
+        "operation": "deleteByFilter",
+        "matchField": "shopperId",
+        "matchValue": "={{ $json.body.shopperId }}"
+      },
+      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "Delete Shopper Data",
+      "type": "CUSTOM.bambuserShopperData",
+      "typeVersion": 1,
+      "position": [
+        500,
+        300
+      ],
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "combinator": "or",
+          "conditions": [
+            {
+              "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.statusCode }}",
+              "rightValue": 200
+            },
+            {
+              "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.statusCode }}",
+              "rightValue": 204
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "name": "Deletion Successful?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        750,
+        300
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const triggerData = $('Bambuser Webhook Trigger').first().json;\nconst shopperId = triggerData.body?.shopperId ?? triggerData.shopperId ?? 'unknown';\nconst requestId = triggerData.body?.requestId ?? triggerData.requestId ?? 'unknown';\nconst deleteResult = $input.first().json;\nconst isoDate = new Date().toISOString();\nconst auditLine = `${isoDate} | Request: ${requestId} | Shopper: ${shopperId} | Status: success`;\nreturn [{ json: { auditLine, shopperId, requestId, status: 'success', deleteResult } }];\n",
+        "mode": "runOnceForAllItems"
+      },
+      "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
+      "name": "Format Audit Log (Success)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        200
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const triggerData = $('Bambuser Webhook Trigger').first().json;\nconst shopperId = triggerData.body?.shopperId ?? triggerData.shopperId ?? 'unknown';\nconst requestId = triggerData.body?.requestId ?? triggerData.requestId ?? 'unknown';\nconst deleteResult = $input.first().json;\nconst isoDate = new Date().toISOString();\nconst auditLine = `${isoDate} | Request: ${requestId} | Shopper: ${shopperId} | Status: failed`;\nreturn [{ json: { auditLine, shopperId, requestId, status: 'failed', deleteResult } }];\n",
+        "mode": "runOnceForAllItems"
+      },
+      "id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
+      "name": "Format Audit Log (Failed)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        400
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "document",
+        "operation": "update",
+        "documentURL": "YOUR_GDPR_AUDIT_DOC_ID",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "object": "text",
+              "action": "insert",
+              "locationChoice": "endOfSegmentLocation",
+              "insertSegment": "body",
+              "text": "={{ $json.auditLine }}\n"
+            }
+          ]
+        }
+      },
+      "id": "a7b8c9d0-e1f2-3456-abcd-567890123456",
+      "name": "Append to GDPR Audit Doc",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1250,
+        300
+      ],
+      "onError": "stopWorkflow",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "awV7X3KCEUsQRvJs",
+          "name": "Google Docs account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Bambuser Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Delete Shopper Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Shopper Data": {
+      "main": [
+        [
+          {
+            "node": "Deletion Successful?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deletion Successful?": {
+      "main": [
+        [
+          {
+            "node": "Format Audit Log (Success)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Audit Log (Failed)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Audit Log (Success)": {
+      "main": [
+        [
+          {
+            "node": "Append to GDPR Audit Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Audit Log (Failed)": {
+      "main": [
+        [
+          {
+            "node": "Append to GDPR Audit Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "instanceId": "demo"
+  }
+}

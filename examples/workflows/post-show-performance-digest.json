@@ -1,0 +1,297 @@
+{
+  "updatedAt": "2026-05-21T12:32:38.155Z",
+  "createdAt": "2026-05-21T12:30:09.848Z",
+  "id": "faGAZ9KALVSkSq74",
+  "name": "Post-Show Performance Digest",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "topics": [
+          "show"
+        ],
+        "subscriptionName": "post-show-digest"
+      },
+      "id": "5fda0306-ca60-463b-8d9d-ba2b19a2c1c9",
+      "name": "Bambuser Webhook",
+      "type": "CUSTOM.bambuserWebhookTrigger",
+      "typeVersion": 1,
+      "position": [
+        112,
+        304
+      ],
+      "webhookId": "fe476527-15e5-4c15-bf98-b40b72cc1c8e",
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nif (d.type !== 'show.ended') return [];\nreturn [{ json: { showId: d.showId, showTitle: d.showTitle } }];\n"
+      },
+      "id": "9fe463a2-b470-41fa-b707-a0ebc134d201",
+      "name": "Filter Show Ended",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "showId": "={{ $json.showId }}"
+      },
+      "id": "113aa0de-f0c5-42fa-8498-8271342a306c",
+      "name": "Get Show Details",
+      "type": "CUSTOM.bambuserLivecommerce",
+      "typeVersion": 1,
+      "position": [
+        560,
+        304
+      ],
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "stats",
+        "showId": "={{ $('Filter Show Ended').first().json.showId }}"
+      },
+      "id": "dd3b9b89-3f59-4841-8aaf-5cd17847f58a",
+      "name": "Get Show Stats",
+      "type": "CUSTOM.bambuserLivecommerce",
+      "typeVersion": 1,
+      "position": [
+        784,
+        304
+      ],
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const show  = ($('Get Show Details').first().json.data || {});\nconst stats = ($('Get Show Stats').first().json.data  || {});\nconst prods = (show.products || []).map(p => p.title).filter(Boolean).join(', ') || 'N/A';\nreturn [{\n  json: {\n    showTitle: show.title || 'Untitled',\n    prompt: `Write a concise post-show performance digest for a live shopping event.\n\nShow: \"${show.title || 'Untitled'}\"\nProducts Featured: ${prods}\n\nMetrics:\n• Views: ${stats.views ?? 0}\n• Unique Viewers: ${stats.uniqueViewers ?? 0}\n• Add-to-Cart Clicks: ${stats.addToCartClicks ?? 0}\n• Purchases: ${stats.purchases ?? 0}\n• Revenue: $${stats.revenue ?? 0}\n\nProvide 4 bullet-point highlights and 1 actionable recommendation.\nKeep it brief and data-driven. Plain text, no markdown headers.`\n  }\n}];\n"
+      },
+      "id": "efc47bc9-e0ac-4587-a808-2d681a18f97d",
+      "name": "Build Stats Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "batching": {}
+      },
+      "id": "7961be64-637e-4d4e-8e00-808f7b7f2246",
+      "name": "Write Performance Digest",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1232,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "id": "298bc141-4889-4431-949b-b4de8488501b",
+      "name": "Gemini — Write Performance Digest",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1304,
+        528
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "zWjTkBrecPDssM2x",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const digest = ($input.first().json.text || $input.first().json.output || '').trim();\nconst title  = $('Build Stats Prompt').first().json.showTitle;\nreturn [{ json: { text: `📊 *Post-show digest — ${title}*\\n\\n${digest}` } }];\n"
+      },
+      "id": "18d1b666-78ca-4e39-91ff-ad1951919e0c",
+      "name": "Format Digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $json.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2d839205-9452-47cc-b7f9-2dcb737cdce8",
+      "name": "Send to Slack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1808,
+        304
+      ]
+    }
+  ],
+  "connections": {
+    "Gemini — Write Performance Digest": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Write Performance Digest",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bambuser Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter Show Ended",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Show Ended": {
+      "main": [
+        [
+          {
+            "node": "Get Show Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Show Details": {
+      "main": [
+        [
+          {
+            "node": "Get Show Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Show Stats": {
+      "main": [
+        [
+          {
+            "node": "Build Stats Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Stats Prompt": {
+      "main": [
+        [
+          {
+            "node": "Write Performance Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Performance Digest": {
+      "main": [
+        [
+          {
+            "node": "Format Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Digest": {
+      "main": [
+        [
+          {
+            "node": "Send to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "1cc64e71-b009-4ddc-a98e-0ddd7dcc58e7",
+  "activeVersionId": null,
+  "versionCounter": 3,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-05-21T12:30:09.848Z",
+      "createdAt": "2026-05-21T12:30:09.848Z",
+      "role": "workflow:owner",
+      "workflowId": "faGAZ9KALVSkSq74",
+      "projectId": "uUVVHahY9DnkUBGI",
+      "project": {
+        "updatedAt": "2026-05-20T07:48:48.695Z",
+        "createdAt": "2026-05-20T07:45:46.154Z",
+        "id": "uUVVHahY9DnkUBGI",
+        "name": "Kristoffer Carlson <kristoffer.carlson@bambuser.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "ed732eea-2a2b-4cf0-8959-12366b69e7f0"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

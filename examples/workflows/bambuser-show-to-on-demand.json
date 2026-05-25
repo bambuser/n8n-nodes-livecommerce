@@ -1,0 +1,195 @@
+{
+  "updatedAt": "2026-05-21T11:42:21.542Z",
+  "createdAt": "2026-05-20T09:18:47.396Z",
+  "id": "xXEa8LYZUhRYmKT0",
+  "name": "Bambuser Show → On-Demand",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "topics": [
+          "show"
+        ]
+      },
+      "id": "da61243e-2f59-4418-981a-22dac370dd2d",
+      "name": "Bambuser Webhook Trigger",
+      "type": "CUSTOM.bambuserWebhookTrigger",
+      "position": [
+        112,
+        0
+      ],
+      "webhookId": "b1648fff-d7d0-4841-990c-8202d9029509",
+      "typeVersion": 1,
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "filename": "={{ $json.filename }}",
+        "sourceUrl": "={{ $json.sourceUrl }}",
+        "title": "={{ $json.title }}",
+        "description": "={{ $json.description }}"
+      },
+      "id": "03fc13ae-c4b6-4b7b-9ccb-0ef7eee5aee6",
+      "name": "Create On-Demand Video",
+      "type": "CUSTOM.bambuserOnDemand",
+      "position": [
+        992,
+        0
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const event = $input.first().json;\nif (event.action !== \"update\" || event.payload?.state !== \"ended\") return [];\nreturn [{ json: { showId: event.payload.id, showTitle: event.payload.title || event.payload.id } }];"
+      },
+      "id": "c45cb22a-8320-443a-889f-ab9ffe51dc72",
+      "name": "Filter Show Ended",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        320,
+        0
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "getBroadcasts",
+        "showId": "={{ $json.showId }}"
+      },
+      "type": "CUSTOM.bambuserLivecommerce",
+      "typeVersion": 1,
+      "position": [
+        544,
+        0
+      ],
+      "id": "0f417cd6-77bb-4616-a4a1-9552bc8aaa29",
+      "name": "Get Show Broadcasts",
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const broadcastData = $input.first().json;\nconst results = broadcastData.results ?? [];\nif (!results.length) return [];\nconst latest = results.reduce((a, b) => (a.createdAt > b.createdAt ? a : b));\nconst broadcastId = latest.id;\nconst showData = $(\"Filter Show Ended\").first().json;\nconst showTitle = showData.showTitle || showData.showId;\nreturn [{ json: {\n  broadcastId,\n  filename: `${showTitle}.mp4`,\n  title: showTitle,\n  description: \"\",\n  sourceUrl: `https://cdn.bambuser.net/broadcasts/${broadcastId}`,\n  broadcastLength: latest.length,\n} }];"
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Build On-Demand Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Bambuser Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Filter Show Ended",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Show Ended": {
+      "main": [
+        [
+          {
+            "node": "Get Show Broadcasts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Show Broadcasts": {
+      "main": [
+        [
+          {
+            "node": "Build On-Demand Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build On-Demand Payload": {
+      "main": [
+        [
+          {
+            "node": "Create On-Demand Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": {
+    "node:Bambuser Webhook Trigger": {
+      "webhookId": "d200d28faf723cffc9b6f55c1e42af4b"
+    },
+    "global": {
+      "processedEnds": {
+        "MWeHguFGfzR54RSb8HtT": "2026-05-20T13:15:53.083Z",
+        "wQ2zR6VXAkiBKkRWBsdj": "2026-05-20T15:57:11.730Z"
+      }
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "ace5baf6-946f-4d0c-bde8-acf08eb02b98",
+  "activeVersionId": "ace5baf6-946f-4d0c-bde8-acf08eb02b98",
+  "versionCounter": 208,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-05-20T09:18:47.396Z",
+      "createdAt": "2026-05-20T09:18:47.396Z",
+      "role": "workflow:owner",
+      "workflowId": "xXEa8LYZUhRYmKT0",
+      "projectId": "uUVVHahY9DnkUBGI",
+      "project": {
+        "updatedAt": "2026-05-20T07:48:48.695Z",
+        "createdAt": "2026-05-20T07:45:46.154Z",
+        "id": "uUVVHahY9DnkUBGI",
+        "name": "Kristoffer Carlson <kristoffer.carlson@bambuser.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "ed732eea-2a2b-4cf0-8959-12366b69e7f0"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}
