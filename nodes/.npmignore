@@ -1,0 +1,37 @@
+# Source / build inputs
+src/
+tsconfig.json
+*.ts
+!dist/**/*.d.ts
+
+# Test files (in case any land in dist)
+**/*.test.js
+**/*.test.d.ts
+**/*.spec.js
+**/*.spec.d.ts
+**/__tests__/
+
+# Lint / format config
+eslint.config.mjs
+.eslintrc*
+.prettierrc*
+.prettierignore
+.editorconfig
+
+# Dependency manifests (the consumer regenerates these)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Repo metadata
+.gitignore
+.npmignore
+.github/
+.vscode/
+.idea/
+
+# Coverage / logs
+coverage/
+.nyc_output/
+*.log
+*.tsbuildinfo
