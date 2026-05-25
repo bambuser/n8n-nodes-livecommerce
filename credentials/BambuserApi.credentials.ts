@@ -39,7 +39,7 @@ export class BambuserApi implements ICredentialType {
       name: 'baseUrl',
       type: 'string',
       default: '',
-      placeholder: 'https://liveshopping-api-stage.bambuser.com',
+      placeholder: 'https://liveshopping-api.bambuser.com',
       description: 'Leave empty to use the production URL for the selected region. Set to a stage or local mock URL to override.',
     },
   ];
