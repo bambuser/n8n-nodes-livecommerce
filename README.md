@@ -1,7 +1,9 @@
 # n8n-nodes-livecommerce
 
+[![CI](https://github.com/bambuser/n8n-nodes-livecommerce/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/bambuser/n8n-nodes-livecommerce/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/@bambuser/n8n-nodes-livecommerce.svg)](https://www.npmjs.com/package/@bambuser/n8n-nodes-livecommerce)
 [![npm downloads](https://img.shields.io/npm/dm/@bambuser/n8n-nodes-livecommerce.svg)](https://www.npmjs.com/package/@bambuser/n8n-nodes-livecommerce)
+[![Node 24+](https://img.shields.io/node/v/@bambuser/n8n-nodes-livecommerce.svg)](https://nodejs.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 Community [n8n](https://n8n.io) nodes for the [Bambuser](https://bambuser.com) Live Commerce platform. Connect live shopping, on-demand video, the product catalog, one-to-one calls, shopper-data records, and webhook events into n8n's 400+ integrations without writing custom HTTP code.
