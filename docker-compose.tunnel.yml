@@ -1,0 +1,27 @@
+services:
+  n8n:
+    volumes:
+      - tunnel_data:/shared
+    depends_on:
+      cloudflared:
+        condition: service_healthy
+
+  cloudflared:
+    build:
+      context: .
+      dockerfile: Dockerfile.cloudflared
+    entrypoint: ["/bin/sh", "/scripts/cloudflared-start.sh"]
+    network_mode: host
+    volumes:
+      - ./scripts/cloudflared-start.sh:/scripts/cloudflared-start.sh:ro
+      - tunnel_data:/shared
+    healthcheck:
+      test: ["CMD-SHELL", "[ -s /shared/tunnel-url ]"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+      start_period: 5s
+    restart: unless-stopped
+
+volumes:
+  tunnel_data:
