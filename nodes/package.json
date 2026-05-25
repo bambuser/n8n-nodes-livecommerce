@@ -51,7 +51,8 @@
       "dist/credentials/BambuserApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/BambuserLivecommerce/BambuserLivecommerce.node.js"
+      "dist/nodes/BambuserLivecommerce/BambuserLivecommerce.node.js",
+      "dist/nodes/BambuserOnDemand/BambuserOnDemand.node.js"
     ]
   },
   "devDependencies": {
