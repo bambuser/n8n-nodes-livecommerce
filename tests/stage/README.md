@@ -13,14 +13,15 @@ You need:
 - An API key against a stage Bambuser org you control. Grant only the scopes the tests exercise.
 - The stage base URL.
 
-```bash
-export BAMBUSER_STAGE_API_KEY=<the-key>
-export BAMBUSER_STAGE_BASE_URL=https://<stage-host>/<api-path>
+Copy `.env.stage.example` to `.env.stage` (gitignored) and fill in both values:
 
+```bash
+cp .env.stage.example .env.stage
+$EDITOR .env.stage
 npm run test:stage
 ```
 
-If `BAMBUSER_STAGE_API_KEY` is unset, every test in this directory will skip cleanly so the suite still passes — handy for "did I break something obvious?" smoke runs.
+`npm run test:stage` loads `.env.stage` automatically via Node's built-in `--env-file-if-exists` flag. If the file is absent or either var is empty, every test in this directory will skip cleanly so the suite still passes — handy for "did I break something obvious?" smoke runs.
 
 ## Adding a stage test
 

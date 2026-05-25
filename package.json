@@ -43,7 +43,7 @@
     "lint": "n8n-node lint",
     "lint:fix": "n8n-node lint --fix",
     "test": "node --import tsx --test \"tests/unit/**/*.test.ts\"",
-    "test:stage": "node --import tsx --test \"tests/stage/**/*.test.ts\"",
+    "test:stage": "node --env-file-if-exists=.env.stage --import tsx --test \"tests/stage/**/*.test.ts\"",
     "release": "n8n-node release",
     "prepublishOnly": "n8n-node prerelease"
   },
