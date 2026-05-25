@@ -50,7 +50,9 @@
     "credentials": [
       "dist/credentials/BambuserApi.credentials.js"
     ],
-    "nodes": []
+    "nodes": [
+      "dist/nodes/BambuserLivecommerce/BambuserLivecommerce.node.js"
+    ]
   },
   "devDependencies": {
     "@n8n/node-cli": "^0.23.0",
