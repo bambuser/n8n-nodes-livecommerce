@@ -53,7 +53,8 @@
     "nodes": [
       "dist/nodes/BambuserLivecommerce/BambuserLivecommerce.node.js",
       "dist/nodes/BambuserOnDemand/BambuserOnDemand.node.js",
-      "dist/nodes/BambuserOneToOne/BambuserOneToOne.node.js"
+      "dist/nodes/BambuserOneToOne/BambuserOneToOne.node.js",
+      "dist/nodes/BambuserProductCatalog/BambuserProductCatalog.node.js"
     ]
   },
   "devDependencies": {
