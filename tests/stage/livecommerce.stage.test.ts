@@ -17,7 +17,7 @@ describe('BambuserLivecommerce (stage)', { skip: skipIfNoStageKey() }, () => {
     const result = await node.execute.call(ctx);
 
     assert.equal(result.length, 1);
-    const json = result[0][0].json as { data?: unknown[] };
-    assert.ok(Array.isArray(json.data), 'expected response.data to be an array');
+    const json = result[0][0].json as { results?: unknown[] };
+    assert.ok(Array.isArray(json.results), 'expected response.results to be an array');
   });
 });
