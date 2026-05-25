@@ -75,6 +75,8 @@ Restart n8n. The nodes load from `~/.n8n/custom/node_modules`.
 
 ## Credentials
 
+A Bambuser account is required. You can create one for free at [bambuser.com](https://bambuser.com).
+
 1. Sign in to your Bambuser dashboard ([EU](https://lcx-eu.bambuser.com/) or [US](https://lcx.bambuser.com/), matching your org's data residency) and open **Settings → API Keys**.
 2. Create a new key and grant the scopes your workflow needs (see the list under [Available nodes](#available-nodes)).
 3. In n8n, create a new credential of type **Bambuser API**:
