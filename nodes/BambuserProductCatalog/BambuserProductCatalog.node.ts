@@ -17,6 +17,11 @@ type OperationHandler = (i: number) => Promise<IHttpRequestOptions>;
 const filterEmpty = (obj: Record<string, unknown>): IDataObject =>
   Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== '' && v !== undefined && v !== null)) as IDataObject;
 
+const productsPath = (baseUrl: string, feedId: string): string =>
+  feedId
+    ? `${baseUrl}/product-catalog/feeds/${encodeURIComponent(feedId)}/products`
+    : `${baseUrl}/product-catalog/products`;
+
 const buildOperationHandlers = (
   ctx: IExecuteFunctions,
   baseUrl: string,
@@ -50,26 +55,26 @@ const buildOperationHandlers = (
 
   'product:get': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
-    url: `${baseUrl}/product-catalog/products/${ctx.getNodeParameter('productId', i) as string}`,
+    url: `${productsPath(baseUrl, ctx.getNodeParameter('feedId', i, '') as string)}/${ctx.getNodeParameter('productId', i) as string}`,
   }),
 
   'product:create': async (i) => ({
     method: 'POST' as IHttpRequestMethods,
-    url: `${baseUrl}/product-catalog/products`,
+    url: productsPath(baseUrl, ctx.getNodeParameter('feedId', i, '') as string),
     headers: { 'Content-Type': 'application/json' },
     body: JSON.parse(ctx.getNodeParameter('productBody', i) as string) as IDataObject,
   }),
 
   'product:update': async (i) => ({
     method: 'PATCH' as IHttpRequestMethods,
-    url: `${baseUrl}/product-catalog/products/${ctx.getNodeParameter('productId', i) as string}`,
+    url: `${productsPath(baseUrl, ctx.getNodeParameter('feedId', i, '') as string)}/${ctx.getNodeParameter('productId', i) as string}`,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.parse(ctx.getNodeParameter('productBody', i) as string) as IDataObject,
   }),
 
   'product:delete': async (i) => ({
     method: 'DELETE' as IHttpRequestMethods,
-    url: `${baseUrl}/product-catalog/products/${ctx.getNodeParameter('productId', i) as string}`,
+    url: `${productsPath(baseUrl, ctx.getNodeParameter('feedId', i, '') as string)}/${ctx.getNodeParameter('productId', i) as string}`,
   }),
 });
 
@@ -143,6 +148,14 @@ export class BambuserProductCatalog implements INodeType {
         default: '',
         description: 'Comma-separated feed IDs to scope the search',
         displayOptions: { show: { resource: ['product'], operation: ['search', 'count'] } },
+      },
+      {
+        displayName: 'Feed ID',
+        name: 'feedId',
+        type: 'string',
+        default: '',
+        description: 'Optional. When set, scopes the operation to a specific feed (routes through /product-catalog/feeds/{feedId}/products). Leave empty to operate on the org-level catalog.',
+        displayOptions: { show: { resource: ['product'], operation: ['get', 'create', 'update', 'delete'] } },
       },
       {
         displayName: 'Limit',
