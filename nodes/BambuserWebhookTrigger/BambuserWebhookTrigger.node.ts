@@ -73,12 +73,27 @@ export class BambuserWebhookTrigger implements INodeType {
         const topics = this.getNodeParameter('topics') as string[];
         const subscriptionName = this.getNodeParameter('subscriptionName') as string;
         const staticData = this.getWorkflowStaticData('node');
+        const body = { name: subscriptionName, url: webhookUrl, topics, headers: {} };
+
+        // checkExists returns false both when there's no registration AND when the
+        // URL drifted. In the latter case we already hold a webhookId — PUT to update
+        // rather than POST to create a duplicate.
+        if (typeof staticData.webhookId === 'string' && staticData.webhookId) {
+          await this.helpers.httpRequestWithAuthentication.call(this, 'bambuserApi', {
+            method: 'PUT',
+            url: `${origin}/v1/webhooks/${staticData.webhookId}`,
+            headers: { 'Content-Type': 'application/json' },
+            body,
+          });
+          staticData.webhookUrl = webhookUrl;
+          return true;
+        }
 
         const response = await this.helpers.httpRequestWithAuthentication.call(this, 'bambuserApi', {
           method: 'POST',
           url: `${origin}/v1/webhooks`,
           headers: { 'Content-Type': 'application/json' },
-          body: { name: subscriptionName, url: webhookUrl, topics, headers: {} },
+          body,
         }) as { id: string };
         staticData.webhookId = response.id;
         staticData.webhookUrl = webhookUrl;

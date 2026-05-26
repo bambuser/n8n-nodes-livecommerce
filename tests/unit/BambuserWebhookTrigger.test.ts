@@ -47,6 +47,32 @@ describe('BambuserWebhookTrigger', () => {
     assert.deepEqual(body.topics, ['show']);
   });
 
+  it('create — PUTs to /v1/webhooks/{id} when a webhookId is already stored (URL drifted)', async () => {
+    server.on('PUT', '/v1/webhooks/wh_existing', () => ({ status: 200, body: { id: 'wh_existing', url: webhookUrl } }));
+
+    const node = new BambuserWebhookTrigger();
+    const { ctx, staticData } = buildHookContext({
+      credential: { apiKey: 'test-key', region: 'eu', baseUrl: server.url },
+      parameters: { topics: ['show'], subscriptionName: 'n8n' },
+      webhookUrl,
+      staticData: { webhookId: 'wh_existing', webhookUrl: 'https://stale-tunnel.example.com/webhook/abc' },
+    });
+
+    const created = await node.webhookMethods.default.create.call(ctx);
+    assert.equal(created, true);
+    assert.equal(staticData.webhookId, 'wh_existing', 'must not overwrite the existing webhookId');
+    assert.equal(staticData.webhookUrl, webhookUrl, 'must record the new URL');
+
+    assert.equal(server.requests.length, 1, 'must not also POST');
+    const req = server.requests[0]!;
+    assert.equal(req.method, 'PUT');
+    assert.equal(req.path, '/v1/webhooks/wh_existing');
+    const body = req.body as { name: string; url: string; topics: string[] };
+    assert.equal(body.url, webhookUrl);
+    assert.equal(body.name, 'n8n');
+    assert.deepEqual(body.topics, ['show']);
+  });
+
   it('checkExists — returns false when stored url differs from current (triggers re-register)', async () => {
     const node = new BambuserWebhookTrigger();
     const { ctx } = buildHookContext({
