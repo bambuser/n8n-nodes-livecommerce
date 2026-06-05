@@ -115,16 +115,20 @@ const buildOperationHandlers = (
   }),
 });
 
-export class BambuserOneToOne implements INodeType {
+export class BambuserCalls implements INodeType {
   description: INodeTypeDescription = {
-    displayName: 'Bambuser One-to-One',
-    name: 'bambuserOneToOne',
+    // `displayName` is the UI label and may follow public product branding freely.
+    // `name` is the persisted node type (`<package>.<name>`) baked into every saved
+    // workflow — changing it breaks existing flows, so it is frozen to the internal
+    // concept (calls) and must NOT track marketing renames.
+    displayName: 'Bambuser Video Consultation',
+    name: 'bambuserCalls',
     icon: 'file:bambuser-live.svg',
     group: ['transform'],
     version: 1,
     subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-    description: 'Interact with the Bambuser One-to-One API',
-    defaults: { name: 'Bambuser One-to-One' },
+    description: 'Interact with the Bambuser Video Consultation API',
+    defaults: { name: 'Bambuser Video Consultation' },
     inputs: ['main'],
     outputs: ['main'],
     credentials: [{ name: 'bambuserApi', required: true }],

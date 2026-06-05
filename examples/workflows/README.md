@@ -42,12 +42,12 @@ Uses: `Bambuser Webhook Trigger`, `Bambuser Live`.
 ## calls-analytics-report.json
 
 Weekly schedule: pulls accepted and missed call stats, analyses them with Gemini, and appends the report to a Google Doc.
-Uses: `Bambuser One-to-One`.
+Uses: `Bambuser Video Consultation`.
 
 ## calls-connect-link-bulk-generator.json
 
 Manual trigger: reads appointment IDs from a Google Doc, creates a connect link for each, and appends the links back to the doc.
-Uses: `Bambuser One-to-One`.
+Uses: `Bambuser Video Consultation`.
 
 ## post-show-performance-digest.json
 

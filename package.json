@@ -56,7 +56,7 @@
     "nodes": [
       "dist/nodes/BambuserShows/BambuserShows.node.js",
       "dist/nodes/BambuserVod/BambuserVod.node.js",
-      "dist/nodes/BambuserOneToOne/BambuserOneToOne.node.js",
+      "dist/nodes/BambuserCalls/BambuserCalls.node.js",
       "dist/nodes/BambuserProductCatalog/BambuserProductCatalog.node.js",
       "dist/nodes/BambuserShopperData/BambuserShopperData.node.js",
       "dist/nodes/BambuserWebhookTrigger/BambuserWebhookTrigger.node.js"
