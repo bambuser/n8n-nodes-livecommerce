@@ -2,7 +2,7 @@
   "updatedAt": "2026-05-21T12:40:17.453Z",
   "createdAt": "2026-05-21T12:30:09.485Z",
   "id": "4R4qfpQSqVDsyIj1",
-  "name": "AI On-Demand Description Generator",
+  "name": "AI Shoppable Videos Description Generator",
   "description": "",
   "active": false,
   "isArchived": false,
@@ -23,8 +23,8 @@
         "pageSize": 10
       },
       "id": "f3ea98be-f315-4919-a91c-5fc0c9c577f1",
-      "name": "Get Recent On-Demand Videos",
-      "type": "CUSTOM.bambuserOnDemand",
+      "name": "Get Recent Shoppable Videos",
+      "type": "CUSTOM.bambuserVod",
       "typeVersion": 1,
       "position": [
         336,
@@ -39,7 +39,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const response = $input.first().json;\nconst allVideos = response.data || [];\nconst video = allVideos.find(v => {\n  const details = v.videoDetails;\n  return !details || !details.length || !details[0]?.description;\n}) || allVideos[0];\nif (!video) return [];\nconst details = video.videoDetails?.[0] || {};\nconst title = details.title || video.filename || 'Untitled Show';\nreturn [{\n  json: {\n    videoId: video.id,\n    title,\n    prompt: `You are a content writer for a live shopping video platform.\n\nWrite an engaging description for an on-demand video titled \"${title}\".\nRequirements:\n- 2-3 sentences, max 280 characters\n- Highlight the live shopping experience\n- Encourage viewers to watch\nReturn ONLY the description text, nothing else.`\n  }\n}];"
+        "jsCode": "const response = $input.first().json;\nconst allVideos = response.data || [];\nconst video = allVideos.find(v => {\n  const details = v.videoDetails;\n  return !details || !details.length || !details[0]?.description;\n}) || allVideos[0];\nif (!video) return [];\nconst details = video.videoDetails?.[0] || {};\nconst title = details.title || video.filename || 'Untitled Show';\nreturn [{\n  json: {\n    videoId: video.id,\n    title,\n    prompt: `You are a content writer for a live shopping video platform.\n\nWrite an engaging description for a shoppable video titled \"${title}\".\nRequirements:\n- 2-3 sentences, max 280 characters\n- Highlight the live shopping experience\n- Encourage viewers to watch\nReturn ONLY the description text, nothing else.`\n  }\n}];"
       },
       "id": "15e02fc8-9013-4eb5-8635-98f899853e53",
       "name": "Build Prompt",
@@ -57,7 +57,7 @@
         "batching": {}
       },
       "id": "aae2fae1-ad7f-4970-bff7-1f6c545df614",
-      "name": "Generate On-Demand Metadata",
+      "name": "Generate Shoppable Video Metadata",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.9,
       "position": [
@@ -71,7 +71,7 @@
         "options": {}
       },
       "id": "ec49a8c1-c1a2-43c4-bde2-f0723c60ab8d",
-      "name": "Gemini — Generate On-Demand Metadata",
+      "name": "Gemini — Generate Shoppable Video Metadata",
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1.1,
       "position": [
@@ -106,8 +106,8 @@
         "description": "={{ $json.description }}"
       },
       "id": "2ced56d2-54ed-45d7-b650-c49104276b1e",
-      "name": "Update On-Demand Video",
-      "type": "CUSTOM.bambuserOnDemand",
+      "name": "Update Shoppable Video",
+      "type": "CUSTOM.bambuserVod",
       "typeVersion": 1,
       "position": [
         1360,
@@ -122,11 +122,11 @@
     }
   ],
   "connections": {
-    "Gemini — Generate On-Demand Metadata": {
+    "Gemini — Generate Shoppable Video Metadata": {
       "ai_languageModel": [
         [
           {
-            "node": "Generate On-Demand Metadata",
+            "node": "Generate Shoppable Video Metadata",
             "type": "ai_languageModel",
             "index": 0
           }
@@ -137,14 +137,14 @@
       "main": [
         [
           {
-            "node": "Get Recent On-Demand Videos",
+            "node": "Get Recent Shoppable Videos",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Get Recent On-Demand Videos": {
+    "Get Recent Shoppable Videos": {
       "main": [
         [
           {
@@ -159,14 +159,14 @@
       "main": [
         [
           {
-            "node": "Generate On-Demand Metadata",
+            "node": "Generate Shoppable Video Metadata",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Generate On-Demand Metadata": {
+    "Generate Shoppable Video Metadata": {
       "main": [
         [
           {
@@ -181,7 +181,7 @@
       "main": [
         [
           {
-            "node": "Update On-Demand Video",
+            "node": "Update Shoppable Video",
             "type": "main",
             "index": 0
           }

@@ -1,5 +1,5 @@
 {
-  "name": "On-Demand Description Auto-fill",
+  "name": "Shoppable Videos Description Auto-fill",
   "nodes": [
     {
       "parameters": {
@@ -30,8 +30,8 @@
         "limit": 50
       },
       "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-      "name": "List On-Demand Videos",
-      "type": "CUSTOM.bambuserOnDemand",
+      "name": "List Shoppable Videos",
+      "type": "CUSTOM.bambuserVod",
       "typeVersion": 1,
       "position": [
         500,
@@ -85,7 +85,7 @@
           "values": [
             {
               "role": "user",
-              "content": "=Write a concise 2-sentence description for a live shopping on-demand video. Title: {{ $json.title }}. Tags: {{ Array.isArray($json.tags) ? $json.tags.join(', ') : ($json.tags || '') }}. Return only the description."
+              "content": "=Write a concise 2-sentence description for a live shopping video. Title: {{ $json.title }}. Tags: {{ Array.isArray($json.tags) ? $json.tags.join(', ') : ($json.tags || '') }}. Return only the description."
             }
           ]
         },
@@ -119,7 +119,7 @@
       },
       "id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
       "name": "Update Video Description",
-      "type": "CUSTOM.bambuserOnDemand",
+      "type": "CUSTOM.bambuserVod",
       "typeVersion": 1,
       "position": [
         1500,
@@ -138,14 +138,14 @@
       "main": [
         [
           {
-            "node": "List On-Demand Videos",
+            "node": "List Shoppable Videos",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "List On-Demand Videos": {
+    "List Shoppable Videos": {
       "main": [
         [
           {

@@ -19,15 +19,15 @@ Credentials are not embedded — n8n will prompt you to attach them on first run
 Picks a show missing a description, fetches its products, and asks Gemini to write one before updating the show.
 Uses: `Bambuser Live Commerce`.
 
-## ai-on-demand-description-generator.json
+## ai-shoppable-videos-description-generator.json
 
-Fetches recent on-demand videos and uses Gemini (via LangChain chain) to generate title/description metadata, then writes it back to each one.
-Uses: `Bambuser On Demand`.
+Fetches recent shoppable videos and uses Gemini (via LangChain chain) to generate title/description metadata, then writes it back to each one.
+Uses: `Bambuser Shoppable Videos`.
 
-## bambuser-show-to-on-demand.json
+## bambuser-show-to-shoppable-videos.json
 
-Webhook-triggered: when a live show ends, fetches its broadcasts and creates an on-demand video from them.
-Uses: `Bambuser Webhook Trigger`, `Bambuser Live Commerce`, `Bambuser On Demand`.
+Webhook-triggered: when a live show ends, fetches its broadcasts and creates a shoppable video from them.
+Uses: `Bambuser Webhook Trigger`, `Bambuser Live Commerce`, `Bambuser Shoppable Videos`.
 
 ## live-chat-qa-auto-pinner.json
 
@@ -74,10 +74,10 @@ Uses: `Bambuser Product Catalog`.
 Webhook-triggered erasure request: deletes shopper data via the API and appends a success/failure audit entry to a Google Doc.
 Uses: `Bambuser Webhook Trigger`, `Bambuser Shopper Data`.
 
-## on-demand-description-autofill.json
+## shoppable-videos-description-autofill.json
 
-Scheduled: finds on-demand videos missing descriptions, generates one per video with the Google Gemini node, and updates the video.
-Uses: `Bambuser On Demand`.
+Scheduled: finds shoppable videos missing descriptions, generates one per video with the Google Gemini node, and updates the video.
+Uses: `Bambuser Shoppable Videos`.
 
 ## weekly-show-performance-report.json
 

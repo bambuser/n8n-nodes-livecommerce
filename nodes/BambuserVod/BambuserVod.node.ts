@@ -308,16 +308,20 @@ const buildOperationHandlers = (
   }),
 });
 
-export class BambuserOnDemand implements INodeType {
+export class BambuserVod implements INodeType {
   description: INodeTypeDescription = {
-    displayName: 'Bambuser On Demand',
-    name: 'bambuserOnDemand',
+    // `displayName` is the UI label and may follow public product branding freely.
+    // `name` is the persisted node type (`<package>.<name>`) baked into every saved
+    // workflow — changing it breaks existing flows, so it is frozen to the internal
+    // concept (vod) and must NOT track marketing renames.
+    displayName: 'Bambuser Shoppable Videos',
+    name: 'bambuserVod',
     icon: 'file:bambuser-vod.svg',
     group: ['transform'],
     version: 1,
     subtitle: '={{$parameter["resource"] + ": " + $parameter["operation"]}}',
     description: 'Manage VOD videos, media assets, and playlists via the Bambuser public API. Requires VOD_MANAGE scope.',
-    defaults: { name: 'Bambuser On Demand' },
+    defaults: { name: 'Bambuser Shoppable Videos' },
     inputs: ['main'],
     outputs: ['main'],
     credentials: [{ name: 'bambuserApi', required: true }],
