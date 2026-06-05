@@ -6,11 +6,11 @@
 [![Node 24+](https://img.shields.io/node/v/@bambuser/n8n-nodes-livecommerce.svg)](https://nodejs.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-Community [n8n](https://n8n.io) nodes for the [Bambuser](https://bambuser.com) Live Commerce platform. Connect live shopping, on-demand video, the product catalog, one-to-one calls, shopper-data records, and webhook events into n8n's 400+ integrations without writing custom HTTP code.
+Community [n8n](https://n8n.io) nodes for the [Bambuser](https://bambuser.com) video-commerce platform. Connect **Bambuser Live**, **Bambuser Shoppable Videos**, **Bambuser Video Consultation**, the product catalog, shopper-data records, and webhook events into n8n's 400+ integrations without writing custom HTTP code.
 
 ## About
 
-Bambuser powers live and on-demand video commerce for retailers and brands. This package wraps the public Bambuser APIs as native n8n nodes so non-engineers can wire video-commerce events into CRMs, data warehouses, messaging platforms, and analytics tools by dragging nodes onto a canvas. The package is maintained by Bambuser and developed in the open.
+Bambuser powers live, on-demand, and one-to-one video commerce for retailers and brands. This package wraps the public Bambuser APIs as native n8n nodes so non-engineers can wire video-commerce events into CRMs, data warehouses, messaging platforms, and analytics tools by dragging nodes onto a canvas. The package is maintained by Bambuser and developed in the open.
 
 ## Available nodes
 
@@ -20,12 +20,12 @@ All nodes share a single `Bambuser API` credential. Each maps to a Bambuser prod
 - `show.*`, `broadcast.*`, `product.*`, `product-highlight.*`, `user.*` topics
 - Requires the `WRITE_WEBHOOKS` API-key scope
 
-**Bambuser Live Commerce** — Read and write live show data mid-workflow.
+**Bambuser Live** — Read and write live show data mid-workflow.
 - List, create, update, publish, and schedule shows
 - Pin and unpin chat messages
 - Manage product highlights and pull viewer/sales metrics
 
-**Bambuser On Demand** — Create and manage VOD assets.
+**Bambuser Shoppable Videos** — Create and manage VOD assets.
 - Clip a broadcast into a VOD
 - Manage media assets, captions, and video playlists
 - Query the video library
@@ -35,7 +35,7 @@ All nodes share a single `Bambuser API` credential. Each maps to a Bambuser prod
 - Create, update, delete
 - Suitable for AI enrichment and stock-sync workflows
 
-**Bambuser One-to-One** — Automate one-to-one video calls and connect links.
+**Bambuser Video Consultation** — Automate one-to-one video calls and connect links.
 - Create connect links
 - Fetch call transcripts
 - Manage agents, appointments, and availability
