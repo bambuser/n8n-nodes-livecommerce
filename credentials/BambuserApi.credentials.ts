@@ -5,8 +5,7 @@ import type {
   INodeProperties,
 } from 'n8n-workflow';
 
-const REGION_ORIGIN_EXPRESSION =
-  '={{ ($credentials.baseUrl || "").replace(/\\/$/, "") || ($credentials.region === "us" ? "https://liveshopping-api-us.bambuser.com" : "https://liveshopping-api-eu.bambuser.com") }}';
+import { RESOLVE_ORIGIN_EXPRESSION } from '../lib/resolveOrigin';
 
 export class BambuserApi implements ICredentialType {
   name = 'bambuserApi';
@@ -55,7 +54,7 @@ export class BambuserApi implements ICredentialType {
 
   test: ICredentialTestRequest = {
     request: {
-      baseURL: REGION_ORIGIN_EXPRESSION,
+      baseURL: RESOLVE_ORIGIN_EXPRESSION,
       url: '/v1/shows',
       qs: { limit: 1 },
     },
