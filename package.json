@@ -54,7 +54,7 @@
       "dist/credentials/BambuserApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/BambuserLivecommerce/BambuserLivecommerce.node.js",
+      "dist/nodes/BambuserShows/BambuserShows.node.js",
       "dist/nodes/BambuserVod/BambuserVod.node.js",
       "dist/nodes/BambuserOneToOne/BambuserOneToOne.node.js",
       "dist/nodes/BambuserProductCatalog/BambuserProductCatalog.node.js",

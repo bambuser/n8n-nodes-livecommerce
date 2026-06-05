@@ -50,7 +50,7 @@
       },
       "id": "113aa0de-f0c5-42fa-8498-8271342a306c",
       "name": "Get Show Details",
-      "type": "CUSTOM.bambuserLivecommerce",
+      "type": "CUSTOM.bambuserShows",
       "typeVersion": 1,
       "position": [
         560,
@@ -70,7 +70,7 @@
       },
       "id": "dd3b9b89-3f59-4841-8aaf-5cd17847f58a",
       "name": "Get Show Stats",
-      "type": "CUSTOM.bambuserLivecommerce",
+      "type": "CUSTOM.bambuserShows",
       "typeVersion": 1,
       "position": [
         784,

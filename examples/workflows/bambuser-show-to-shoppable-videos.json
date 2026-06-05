@@ -70,7 +70,7 @@
         "operation": "getBroadcasts",
         "showId": "={{ $json.showId }}"
       },
-      "type": "CUSTOM.bambuserLivecommerce",
+      "type": "CUSTOM.bambuserShows",
       "typeVersion": 1,
       "position": [
         544,

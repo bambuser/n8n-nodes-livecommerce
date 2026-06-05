@@ -33,7 +33,7 @@
       },
       "id": "17f2e715-1550-4d87-824f-2214bc1dae13",
       "name": "Get Active Shows",
-      "type": "CUSTOM.bambuserLivecommerce",
+      "type": "CUSTOM.bambuserShows",
       "typeVersion": 1,
       "position": [
         336,
@@ -67,7 +67,7 @@
       },
       "id": "465688b9-b6ce-47b2-a330-04c318e06aea",
       "name": "Get Chat Messages",
-      "type": "CUSTOM.bambuserLivecommerce",
+      "type": "CUSTOM.bambuserShows",
       "typeVersion": 1,
       "position": [
         784,
@@ -151,7 +151,7 @@
       },
       "id": "9aa2d190-829c-41c5-8177-d8cff8cdea62",
       "name": "Pin Top Question",
-      "type": "CUSTOM.bambuserLivecommerce",
+      "type": "CUSTOM.bambuserShows",
       "typeVersion": 1,
       "position": [
         1808,

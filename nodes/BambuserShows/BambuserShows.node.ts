@@ -556,16 +556,20 @@ const SHOW_ID_OPS: ShowOp[] = [
 
 const STATS_SHOW_ID_OPS: StatsOp[] = ['getShow', 'getShowOrders', 'getShowTraffic'];
 
-export class BambuserLivecommerce implements INodeType {
+export class BambuserShows implements INodeType {
   description: INodeTypeDescription = {
-    displayName: 'Bambuser Live Commerce',
-    name: 'bambuserLivecommerce',
+    // `displayName` is the UI label and may follow public product branding freely.
+    // `name` is the persisted node type (`<package>.<name>`) baked into every saved
+    // workflow — changing it breaks existing flows, so it is frozen to the internal
+    // concept (shows) and must NOT track marketing renames.
+    displayName: 'Bambuser Live',
+    name: 'bambuserShows',
     icon: 'file:bambuser-live.svg',
     group: ['transform'],
     version: 1,
     subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-    description: 'Interact with the Bambuser Live Commerce API',
-    defaults: { name: 'Bambuser Live Commerce' },
+    description: 'Interact with the Bambuser Live API',
+    defaults: { name: 'Bambuser Live' },
     inputs: ['main'],
     outputs: ['main'],
     credentials: [{ name: 'bambuserApi', required: true }],

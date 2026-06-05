@@ -3,7 +3,7 @@ import { strict as assert } from 'node:assert';
 import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 
-import { BambuserLivecommerce } from '../../nodes/BambuserLivecommerce/BambuserLivecommerce.node';
+import { BambuserShows } from '../../nodes/BambuserShows/BambuserShows.node';
 import { buildExecuteContext } from '../helpers/executeContext';
 import { startMockServer } from '../helpers/mockServer';
 
@@ -11,7 +11,7 @@ const showGetManyFixture = JSON.parse(
   readFileSync(new URL('../fixtures/show.getMany.json', import.meta.url), 'utf8'),
 );
 
-describe('BambuserLivecommerce', () => {
+describe('BambuserShows', () => {
   let server: Awaited<ReturnType<typeof startMockServer>>;
 
   beforeEach(async () => {
@@ -25,7 +25,7 @@ describe('BambuserLivecommerce', () => {
   it('show:getMany — sends GET /v1/shows with limit, returns { results } per spec', async () => {
     server.on('GET', '/v1/shows', () => ({ body: showGetManyFixture }));
 
-    const node = new BambuserLivecommerce();
+    const node = new BambuserShows();
     const ctx = buildExecuteContext({
       credential: { apiKey: 'test-key', region: 'eu', baseUrl: server.url },
       parameters: { resource: 'show', operation: 'getMany', limit: 5 },

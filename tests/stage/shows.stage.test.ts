@@ -2,13 +2,13 @@
 import { strict as assert } from 'node:assert';
 import { describe, it } from 'node:test';
 
-import { BambuserLivecommerce } from '../../nodes/BambuserLivecommerce/BambuserLivecommerce.node';
+import { BambuserShows } from '../../nodes/BambuserShows/BambuserShows.node';
 import { buildExecuteContext } from '../helpers/executeContext';
 import { skipIfNoStageKey, stageCredential } from '../helpers/stage';
 
-describe('BambuserLivecommerce (stage)', { skip: skipIfNoStageKey() }, () => {
+describe('BambuserShows (stage)', { skip: skipIfNoStageKey() }, () => {
   it('show:getMany — fixture org responds with a data array', async () => {
-    const node = new BambuserLivecommerce();
+    const node = new BambuserShows();
     const ctx = buildExecuteContext({
       credential: stageCredential(),
       parameters: { resource: 'show', operation: 'getMany', limit: 5 },

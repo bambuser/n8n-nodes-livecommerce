@@ -24,7 +24,7 @@
       },
       "id": "ff7d970c-3c8c-4cf9-8850-5a1c814ca578",
       "name": "Get Shows",
-      "type": "CUSTOM.bambuserLivecommerce",
+      "type": "CUSTOM.bambuserShows",
       "typeVersion": 1,
       "position": [
         336,
@@ -57,7 +57,7 @@
       },
       "id": "e2ed90ba-aa09-4faa-8603-9ad6cca3e7e1",
       "name": "Get Show Products",
-      "type": "CUSTOM.bambuserLivecommerce",
+      "type": "CUSTOM.bambuserShows",
       "typeVersion": 1,
       "position": [
         784,
@@ -143,7 +143,7 @@
       },
       "id": "06216d95-68c6-4a95-860c-1570f0a74856",
       "name": "Update Show",
-      "type": "CUSTOM.bambuserLivecommerce",
+      "type": "CUSTOM.bambuserShows",
       "typeVersion": 1,
       "position": [
         1808,
