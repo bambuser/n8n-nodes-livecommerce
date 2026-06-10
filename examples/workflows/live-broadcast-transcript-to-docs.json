@@ -1,0 +1,227 @@
+{
+  "name": "Livecommerce: Broadcast Transcript to Google Docs",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Bambuser Webhook Trigger",
+      "type": "CUSTOM.bambuserWebhookTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "broadcast",
+        "operation": "getTranscriptions",
+        "broadcastId": "={{ $json.broadcastId }}"
+      },
+      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "Bambuser Live",
+      "type": "CUSTOM.bambuserShows",
+      "typeVersion": 1,
+      "position": [
+        500,
+        300
+      ],
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const broadcastId = $('BambuserWebhookTrigger').first().json.broadcastId;\nconst date = new Date().toISOString().slice(0, 10);\n\nconst transcriptText = $input.all()\n  .map(item => (item.json.text || item.json.content || item.json.transcript || '').trim())\n  .filter(segment => segment.length > 0)\n  .join('\\n');\n\nreturn [{ json: { transcriptText, broadcastId, date } }];"
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "name": "ConcatenateTranscript",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        750,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Clean up and summarise this live shopping broadcast transcript. Fix speaker errors, remove filler words, and add a 3-bullet summary at the top:\n\n{{ $json.transcriptText }}"
+      },
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+      "name": "GeminiLLMChain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1000,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.3,
+          "maxOutputTokens": 4096
+        }
+      },
+      "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
+      "name": "GoogleGeminiChatModel",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1000,
+        500
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "zWjTkBrecPDssM2x",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "document",
+        "operation": "create",
+        "driveId": "myDrive",
+        "folderId": "root",
+        "title": "=Broadcast Transcript \u2013 {{ $('ConcatenateTranscript').first().json.broadcastId }} \u2013 {{ $('ConcatenateTranscript').first().json.date }}"
+      },
+      "id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
+      "name": "CreateGoogleDoc",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1250,
+        300
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "awV7X3KCEUsQRvJs",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "document",
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "object": "text",
+              "action": "insert",
+              "locationChoice": "endOfSegmentLocation",
+              "insertSegment": "body",
+              "text": "={{ $('GeminiLLMChain').first().json.text }}"
+            }
+          ]
+        }
+      },
+      "id": "a7b8c9d0-e1f2-3456-abcd-567890123456",
+      "name": "WriteTranscriptToDoc",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        300
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "awV7X3KCEUsQRvJs",
+          "name": "Google Docs account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Bambuser Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Bambuser Live",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bambuser Live": {
+      "main": [
+        [
+          {
+            "node": "ConcatenateTranscript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ConcatenateTranscript": {
+      "main": [
+        [
+          {
+            "node": "GeminiLLMChain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GeminiLLMChain": {
+      "main": [
+        [
+          {
+            "node": "CreateGoogleDoc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GoogleGeminiChatModel": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "GeminiLLMChain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CreateGoogleDoc": {
+      "main": [
+        [
+          {
+            "node": "WriteTranscriptToDoc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "instanceId": "demo"
+  }
+}

@@ -1,0 +1,338 @@
+{
+  "updatedAt": "2026-05-21T12:32:27.015Z",
+  "createdAt": "2026-05-21T12:30:09.922Z",
+  "id": "GhY4Y5wAgq8jqm1T",
+  "name": "Weekly Show Performance Report",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1"
+            }
+          ]
+        }
+      },
+      "id": "5a297f1c-1abf-4b67-ab53-deb2a29b4162",
+      "name": "Every Monday 9am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        112,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const now  = new Date();\nconst to   = now.toISOString().split('T')[0];\nconst from = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];\nreturn [{ json: { from, to } }];\n"
+      },
+      "id": "bb9ca580-cb2d-435b-936f-62a032a0580a",
+      "name": "Build Date Range",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "stats",
+        "operation": "getShows",
+        "from": "={{ $json.from }}",
+        "to": "={{ $json.to }}"
+      },
+      "id": "18ffde2b-1ecb-4260-a94a-6c5f15f7aa8a",
+      "name": "Get Shows Stats",
+      "type": "CUSTOM.bambuserShows",
+      "typeVersion": 1,
+      "position": [
+        560,
+        304
+      ],
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "limit": 20
+      },
+      "id": "37b9483b-fd62-4d52-806e-62b922c3aaee",
+      "name": "Get Recent Shows",
+      "type": "CUSTOM.bambuserShows",
+      "typeVersion": 1,
+      "position": [
+        784,
+        304
+      ],
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const dates  = $('Build Date Range').first().json;\nconst stats  = $('Get Shows Stats').first().json.data || {};\nconst shows  = $('Get Recent Shows').all();\nconst titles = shows.slice(0, 5).map(s => s.json.title || 'Untitled').join(', ');\n\nconst avgViewsPerShow = shows.length ? Math.round((stats.views ?? 0) / shows.length) : 0;\nconst viewToCartPct   = stats.views\n  ? (((stats.addToCartClicks ?? 0) / stats.views) * 100).toFixed(1)\n  : '0.0';\nconst cartToPurchasePct = stats.addToCartClicks\n  ? (((stats.purchases ?? 0) / stats.addToCartClicks) * 100).toFixed(1)\n  : '0.0';\nconst revenuePerViewer = stats.uniqueViewers\n  ? ((stats.revenue ?? 0) / stats.uniqueViewers).toFixed(2)\n  : '0.00';\n\nreturn [{\n  json: {\n    from: dates.from,\n    to: dates.to,\n    title: `Weekly Live Shopping Report: ${dates.from} \u2192 ${dates.to}`,\n    prompt: `You are writing a weekly performance digest for a live shopping management team.\n\nPeriod: ${dates.from} \u2192 ${dates.to}\nShows Produced: ${shows.length}\nRecent Show Titles: ${titles || 'N/A'}\n\nAggregate Stats:\n- Total Views: ${stats.views ?? 0}\n- Unique Viewers: ${stats.uniqueViewers ?? 0}\n- Add-to-Cart Clicks: ${stats.addToCartClicks ?? 0}\n- Purchases: ${stats.purchases ?? 0}\n- Revenue: $${(stats.revenue ?? 0).toLocaleString()}\n\nDerived Metrics:\n- Avg Views Per Show: ${avgViewsPerShow}\n- View-to-Cart Rate: ${viewToCartPct}%\n- Cart-to-Purchase Rate: ${cartToPurchasePct}%\n- Revenue per Unique Viewer: $${revenuePerViewer}\n\nWrite a structured weekly analysis with these sections:\n\nPERFORMANCE SUMMARY\nOne paragraph overview of the week. Lead with the most significant result.\n\nCONVERSION FUNNEL ANALYSIS\nAnalyse the funnel from views to purchase. Identify where drop-off is highest and what it suggests about audience intent, product-show alignment, or presentation quality.\n\nHIGHLIGHTS\n3 specific positive observations, each with a brief data-backed reason.\n\nCONCERNS\n1-2 areas needing attention with concrete reasoning. Be direct.\n\nRECOMMENDATIONS\n3 actionable recommendations for next week. Tie each to a specific metric.\n\nOUTLOOK\nOne forward-looking sentence.\n\nRules: plain text only, section names in ALL CAPS on their own line, no markdown, no bullet symbols, professional tone.`\n  }\n}];"
+      },
+      "id": "123c8595-c5f9-4872-91c5-e69a6ddbd83b",
+      "name": "Build Report Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "batching": {}
+      },
+      "id": "83eedc13-2364-413c-84ef-5932a8bd7d6e",
+      "name": "Write Weekly Report",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1232,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "id": "49bb1946-2ddb-4ab4-bcbe-4a17998883f7",
+      "name": "Gemini \u2014 Write Weekly Report",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1304,
+        528
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "zWjTkBrecPDssM2x",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const report = ($input.first().json.text || $input.first().json.output || '').trim();\nconst d      = $('Build Report Prompt').first().json;\nreturn [{ json: {\n  title: d.title,\n  body:  report,\n} }];"
+      },
+      "id": "21bb9056-faaf-46b7-bf5f-603e8fcdb516",
+      "name": "Format Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        304
+      ]
+    },
+    {
+      "id": "4bd7bc6e-36cb-483d-a33c-a4076d6e444d",
+      "name": "Create Google Doc",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        304
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "awV7X3KCEUsQRvJs",
+          "name": "Google Docs account"
+        }
+      },
+      "parameters": {
+        "resource": "document",
+        "operation": "create",
+        "title": "={{ $json.title }}",
+        "driveId": "myDrive",
+        "folderId": "root"
+      }
+    },
+    {
+      "id": "b419b634-b349-4f1b-b7d1-4faf1c60c0a1",
+      "name": "Insert Report Content",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        304
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "awV7X3KCEUsQRvJs",
+          "name": "Google Docs account"
+        }
+      },
+      "parameters": {
+        "resource": "document",
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "simple": true,
+        "actionsUi": {
+          "actionFields": [
+            {
+              "object": "text",
+              "action": "insert",
+              "locationChoice": "endOfSegmentLocation",
+              "index": 0,
+              "text": "={{ $(\"Format Report\").first().json.body }}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gemini \u2014 Write Weekly Report": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Write Weekly Report",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Every Monday 9am": {
+      "main": [
+        [
+          {
+            "node": "Build Date Range",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Date Range": {
+      "main": [
+        [
+          {
+            "node": "Get Shows Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Shows Stats": {
+      "main": [
+        [
+          {
+            "node": "Get Recent Shows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Recent Shows": {
+      "main": [
+        [
+          {
+            "node": "Build Report Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Report Prompt": {
+      "main": [
+        [
+          {
+            "node": "Write Weekly Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Weekly Report": {
+      "main": [
+        [
+          {
+            "node": "Format Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Report": {
+      "main": [
+        [
+          {
+            "node": "Create Google Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Google Doc": {
+      "main": [
+        [
+          {
+            "node": "Insert Report Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "e8d3e8da-60bd-4550-9c36-76ec20047495",
+  "activeVersionId": null,
+  "versionCounter": 3,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-05-21T12:30:09.922Z",
+      "createdAt": "2026-05-21T12:30:09.922Z",
+      "role": "workflow:owner",
+      "workflowId": "GhY4Y5wAgq8jqm1T",
+      "projectId": "uUVVHahY9DnkUBGI",
+      "project": {
+        "updatedAt": "2026-05-20T07:48:48.695Z",
+        "createdAt": "2026-05-20T07:45:46.154Z",
+        "id": "uUVVHahY9DnkUBGI",
+        "name": "Kristoffer Carlson <kristoffer.carlson@bambuser.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "ed732eea-2a2b-4cf0-8959-12366b69e7f0"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

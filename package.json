@@ -1,0 +1,77 @@
+{
+  "name": "@bambuser/n8n-nodes-livecommerce",
+  "version": "0.1.0",
+  "description": "n8n nodes for the Bambuser Live Commerce platform — live shopping, video on demand, calls, product catalog, shopper data, and webhook triggers. Free Bambuser account at https://bambuser.com.",
+  "keywords": [
+    "n8n-community-node-package",
+    "n8n",
+    "bambuser",
+    "livecommerce",
+    "live-shopping",
+    "video-commerce",
+    "vod",
+    "product-catalog"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/bambuser/n8n-nodes-livecommerce#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bambuser/n8n-nodes-livecommerce.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bambuser/n8n-nodes-livecommerce/issues"
+  },
+  "author": {
+    "name": "Bambuser",
+    "url": "https://bambuser.com"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "n8n-node build",
+    "build:watch": "tsc --watch",
+    "dev": "n8n-node dev",
+    "lint": "n8n-node lint",
+    "lint:fix": "n8n-node lint --fix",
+    "test": "node --import tsx --test \"tests/unit/**/*.test.ts\"",
+    "test:stage": "node --env-file-if-exists=.env.stage --import tsx --test \"tests/stage/**/*.test.ts\"",
+    "release": "n8n-node release",
+    "prepublishOnly": "n8n-node prerelease"
+  },
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "strict": true,
+    "credentials": [
+      "dist/credentials/BambuserApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/BambuserShows/BambuserShows.node.js",
+      "dist/nodes/BambuserVod/BambuserVod.node.js",
+      "dist/nodes/BambuserCalls/BambuserCalls.node.js",
+      "dist/nodes/BambuserProductCatalog/BambuserProductCatalog.node.js",
+      "dist/nodes/BambuserShopperData/BambuserShopperData.node.js",
+      "dist/nodes/BambuserWebhookTrigger/BambuserWebhookTrigger.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@n8n/node-cli": "^0.23.0",
+    "@types/node": "^24.0.0",
+    "eslint": "9.39.4",
+    "prettier": "3.8.3",
+    "release-it": "20.0.1",
+    "tsx": "^4.22.3",
+    "typescript": "5.9.3"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
+}

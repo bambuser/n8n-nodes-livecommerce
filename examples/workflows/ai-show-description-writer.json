@@ -1,0 +1,285 @@
+{
+  "updatedAt": "2026-05-21T12:47:11.761Z",
+  "createdAt": "2026-05-21T12:30:09.890Z",
+  "id": "AK5neSgrmtGly9ti",
+  "name": "AI Show Description Writer",
+  "description": "",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "3da84f31-2212-4039-b05a-ddac0ea56da7",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        112,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "limit": 10
+      },
+      "id": "ff7d970c-3c8c-4cf9-8850-5a1c814ca578",
+      "name": "Get Shows",
+      "type": "CUSTOM.bambuserShows",
+      "typeVersion": 1,
+      "position": [
+        336,
+        304
+      ],
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst shows = response.results || [];\nconst show = shows.find(s => !s.description || s.description.trim() === '') || shows[0];\nif (!show) return [];\nreturn [{ json: { showId: show.id, title: show.title || 'Untitled Show' } }];"
+      },
+      "id": "6e399221-03a6-469c-a973-e927c15f64ba",
+      "name": "Pick Show Needing Description",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getProducts",
+        "showId": "={{ $json.showId }}"
+      },
+      "id": "e2ed90ba-aa09-4faa-8603-9ad6cca3e7e1",
+      "name": "Get Show Products",
+      "type": "CUSTOM.bambuserShows",
+      "typeVersion": 1,
+      "position": [
+        784,
+        304
+      ],
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const showData = $('Pick Show Needing Description').first().json;\nconst products = $input.all()\n  .flatMap(i => {\n    const j = i.json;\n    return j.data || j.results || j.products || (Array.isArray(j) ? j : []);\n  })\n  .map(p => p.title || p.name)\n  .filter(Boolean);\nconst productList = products.length ? products.join(', ') : 'various products';\nreturn [{\n  json: {\n    showId: showData.showId,\n    title:  showData.title,\n    prompt: `Write a compelling show description for a Bambuser live shopping event.\n\nShow Title: \"${showData.title}\"\nFeatured Products: ${productList}\n\nRequirements:\n- 2-4 sentences, max 400 characters\n- Create excitement about watching live\n- Mention key products naturally\n- End with a call to action\nReturn ONLY the description text.`\n  }\n}];"
+      },
+      "id": "0fa64109-b279-4455-82ed-f118936b5035",
+      "name": "Build Show Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "batching": {}
+      },
+      "id": "62e49c1f-d6c4-4a82-9959-4dd66a2c5ad5",
+      "name": "Write Show Description",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1232,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "id": "68b09424-f8d5-453c-90d3-31ebba7c10b2",
+      "name": "Gemini — Write Show Description",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1304,
+        528
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "zWjTkBrecPDssM2x",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const desc     = ($input.first().json.text || $input.first().json.output || '').trim().slice(0, 400);\nconst showData = $('Build Show Prompt').first().json;\nreturn [{ json: { showId: showData.showId, title: showData.title, description: desc } }];\n"
+      },
+      "id": "cecf8997-efa0-4ef3-afb0-3674cf9e7928",
+      "name": "Parse Description",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "showId": "={{ $json.showId }}",
+        "fields": {
+          "values": {
+            "description": "={{ $json.description }}"
+          }
+        }
+      },
+      "id": "06216d95-68c6-4a95-860c-1570f0a74856",
+      "name": "Update Show",
+      "type": "CUSTOM.bambuserShows",
+      "typeVersion": 1,
+      "position": [
+        1808,
+        304
+      ],
+      "credentials": {
+        "bambuserApi": {
+          "id": "v775jz3jBLJcNwlW",
+          "name": "Bambuser account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gemini — Write Show Description": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Write Show Description",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Shows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Shows": {
+      "main": [
+        [
+          {
+            "node": "Pick Show Needing Description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pick Show Needing Description": {
+      "main": [
+        [
+          {
+            "node": "Get Show Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Show Products": {
+      "main": [
+        [
+          {
+            "node": "Build Show Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Show Prompt": {
+      "main": [
+        [
+          {
+            "node": "Write Show Description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Show Description": {
+      "main": [
+        [
+          {
+            "node": "Parse Description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Description": {
+      "main": [
+        [
+          {
+            "node": "Update Show",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "64babd12-e3fd-417c-aac2-0ef79bc7bdb0",
+  "activeVersionId": null,
+  "versionCounter": 4,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-05-21T12:30:09.890Z",
+      "createdAt": "2026-05-21T12:30:09.890Z",
+      "role": "workflow:owner",
+      "workflowId": "AK5neSgrmtGly9ti",
+      "projectId": "uUVVHahY9DnkUBGI",
+      "project": {
+        "updatedAt": "2026-05-20T07:48:48.695Z",
+        "createdAt": "2026-05-20T07:45:46.154Z",
+        "id": "uUVVHahY9DnkUBGI",
+        "name": "Kristoffer Carlson <kristoffer.carlson@bambuser.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "ed732eea-2a2b-4cf0-8959-12366b69e7f0"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

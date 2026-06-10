@@ -1,0 +1,25 @@
+{
+  "data": [
+    {
+      "id": "123",
+      "orgId": "yourOrgId",
+      "type": "competition-entry",
+      "purposes": [
+        "single-competition-communication"
+      ],
+      "data": {
+        "name": "Jon Doe",
+        "email": "jon.doe@example.com",
+        "phone": "+1234567890"
+      },
+      "metadata": {
+        "showId": "ABC",
+        "competitionId": "XYZ"
+      },
+      "createdAt": "2021-01-01T00:00:00Z"
+    }
+  ],
+  "pagination": {
+    "pageSize": 25
+  }
+}

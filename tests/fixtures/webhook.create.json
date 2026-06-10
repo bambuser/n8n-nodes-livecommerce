@@ -1,0 +1,11 @@
+{
+  "id": "5j2JAem3BdnFnXvyPPtvC1",
+  "name": "My webhook",
+  "url": "https://example.com/webhook",
+  "topics": [
+    "show"
+  ],
+  "headers": {
+    "authorization": "my-api-key"
+  }
+}

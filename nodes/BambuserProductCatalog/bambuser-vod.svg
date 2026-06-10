@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75 72">
+  <defs>
+    <clipPath id="bvod-a">
+      <path d="M36.3354 72h-36V0h36z"/>
+    </clipPath>
+    <clipPath id="bvod-b">
+      <path d="M75.0005 72h-36V0h36z"/>
+    </clipPath>
+  </defs>
+  <circle cx="0.3354" cy="36" r="36" fill="#FB752B" clip-path="url(#bvod-a)"/>
+  <circle cx="39.0005" cy="36" r="36" fill="#FB752B" clip-path="url(#bvod-b)"/>
+</svg>
