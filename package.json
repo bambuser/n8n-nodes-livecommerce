@@ -1,6 +1,6 @@
 {
   "name": "@bambuser/n8n-nodes-livecommerce",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "n8n nodes for the Bambuser Live Commerce platform — live shopping, video on demand, calls, product catalog, shopper data, and webhook triggers. Free Bambuser account at https://bambuser.com.",
   "keywords": [
     "n8n-community-node-package",
