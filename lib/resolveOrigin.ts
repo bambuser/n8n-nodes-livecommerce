@@ -1,6 +1,9 @@
+// Region URLs per the public Bambuser REST API docs. The "US" region resolves to
+// the documented Global base URL — used by dashboards on lcx.bambuser.com — since
+// no separate liveshopping-api-us.bambuser.com host exists.
 const ORIGIN_BY_REGION: Readonly<Record<string, string>> = {
   eu: 'https://liveshopping-api-eu.bambuser.com',
-  us: 'https://liveshopping-api-us.bambuser.com',
+  us: 'https://liveshopping-api.bambuser.com',
 };
 
 export const resolveOrigin = (baseUrl: string, region: string): string =>
