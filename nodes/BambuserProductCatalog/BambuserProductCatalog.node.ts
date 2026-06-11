@@ -19,8 +19,8 @@ const filterEmpty = (obj: Record<string, unknown>): IDataObject =>
 
 const productsPath = (baseUrl: string, feedId: string): string =>
   feedId
-    ? `${baseUrl}/feeds/${encodeURIComponent(feedId)}/products`
-    : `${baseUrl}/products`;
+    ? `${baseUrl}/product-catalog/feeds/${encodeURIComponent(feedId)}/products`
+    : `${baseUrl}/product-catalog/products`;
 
 const buildOperationHandlers = (
   ctx: IExecuteFunctions,
@@ -29,7 +29,7 @@ const buildOperationHandlers = (
 
   'product:search': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
-    url: `${baseUrl}/products`,
+    url: `${baseUrl}/product-catalog/products`,
     qs: filterEmpty({
       q: ctx.getNodeParameter('q', i, '') as string,
       limit: ctx.getNodeParameter('limit', i, 10) as number,
@@ -45,7 +45,7 @@ const buildOperationHandlers = (
 
   'product:count': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
-    url: `${baseUrl}/products/count`,
+    url: `${baseUrl}/product-catalog/products/count`,
     qs: filterEmpty({
       q: ctx.getNodeParameter('q', i, '') as string,
       feedId: ctx.getNodeParameter('feedId', i, '') as string,
@@ -154,7 +154,7 @@ export class BambuserProductCatalog implements INodeType {
         name: 'feedId',
         type: 'string',
         default: '',
-        description: 'Optional. When set, scopes the operation to a specific feed (routes through /feeds/{feedId}/products). Leave empty to operate on the org-level catalog.',
+        description: 'Optional. When set, scopes the operation to a specific feed (routes through /product-catalog/feeds/{feedId}/products). Leave empty to operate on the org-level catalog.',
         displayOptions: { show: { resource: ['product'], operation: ['get', 'create', 'update', 'delete'] } },
       },
       {

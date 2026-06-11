@@ -19,7 +19,7 @@ describe('BambuserProductCatalog', () => {
 
   describe('feedId path scoping for create/get/update/delete', () => {
     it('product:create — no feedId routes through /products', async () => {
-      server.on('POST', '/v1/products', () => ({ status: 201, body: { id: 'p1' } }));
+      server.on('POST', '/v1/product-catalog/products', () => ({ status: 201, body: { id: 'p1' } }));
 
       const node = new BambuserProductCatalog();
       const ctx = buildExecuteContext({
@@ -36,11 +36,11 @@ describe('BambuserProductCatalog', () => {
 
       const req = server.requests[0]!;
       assert.equal(req.method, 'POST');
-      assert.equal(req.path, '/v1/products');
+      assert.equal(req.path, '/v1/product-catalog/products');
     });
 
     it('product:create — with feedId routes through /feeds/{feedId}/products', async () => {
-      server.on('POST', '/v1/feeds/feed_abc/products', () => ({ status: 201, body: { id: 'p1' } }));
+      server.on('POST', '/v1/product-catalog/feeds/feed_abc/products', () => ({ status: 201, body: { id: 'p1' } }));
 
       const node = new BambuserProductCatalog();
       const ctx = buildExecuteContext({
@@ -57,11 +57,11 @@ describe('BambuserProductCatalog', () => {
 
       const req = server.requests[0]!;
       assert.equal(req.method, 'POST');
-      assert.equal(req.path, '/v1/feeds/feed_abc/products');
+      assert.equal(req.path, '/v1/product-catalog/feeds/feed_abc/products');
     });
 
     it('product:get — no feedId routes through /products/{productId}', async () => {
-      server.on('GET', '/v1/products/p1', () => ({ body: { id: 'p1' } }));
+      server.on('GET', '/v1/product-catalog/products/p1', () => ({ body: { id: 'p1' } }));
 
       const node = new BambuserProductCatalog();
       const ctx = buildExecuteContext({
@@ -73,11 +73,11 @@ describe('BambuserProductCatalog', () => {
 
       const req = server.requests[0]!;
       assert.equal(req.method, 'GET');
-      assert.equal(req.path, '/v1/products/p1');
+      assert.equal(req.path, '/v1/product-catalog/products/p1');
     });
 
     it('product:get — with feedId routes through /feeds/{feedId}/products/{productId}', async () => {
-      server.on('GET', '/v1/feeds/feed_abc/products/p1', () => ({ body: { id: 'p1' } }));
+      server.on('GET', '/v1/product-catalog/feeds/feed_abc/products/p1', () => ({ body: { id: 'p1' } }));
 
       const node = new BambuserProductCatalog();
       const ctx = buildExecuteContext({
@@ -89,11 +89,11 @@ describe('BambuserProductCatalog', () => {
 
       const req = server.requests[0]!;
       assert.equal(req.method, 'GET');
-      assert.equal(req.path, '/v1/feeds/feed_abc/products/p1');
+      assert.equal(req.path, '/v1/product-catalog/feeds/feed_abc/products/p1');
     });
 
     it('product:update — with feedId routes PATCH through the feed-scoped path', async () => {
-      server.on('PATCH', '/v1/feeds/feed_abc/products/p1', () => ({ body: { id: 'p1' } }));
+      server.on('PATCH', '/v1/product-catalog/feeds/feed_abc/products/p1', () => ({ body: { id: 'p1' } }));
 
       const node = new BambuserProductCatalog();
       const ctx = buildExecuteContext({
@@ -111,11 +111,11 @@ describe('BambuserProductCatalog', () => {
 
       const req = server.requests[0]!;
       assert.equal(req.method, 'PATCH');
-      assert.equal(req.path, '/v1/feeds/feed_abc/products/p1');
+      assert.equal(req.path, '/v1/product-catalog/feeds/feed_abc/products/p1');
     });
 
     it('product:delete — with feedId routes DELETE through the feed-scoped path', async () => {
-      server.on('DELETE', '/v1/feeds/feed_abc/products/p1', () => ({ status: 204 }));
+      server.on('DELETE', '/v1/product-catalog/feeds/feed_abc/products/p1', () => ({ status: 204 }));
 
       const node = new BambuserProductCatalog();
       const ctx = buildExecuteContext({
@@ -127,11 +127,11 @@ describe('BambuserProductCatalog', () => {
 
       const req = server.requests[0]!;
       assert.equal(req.method, 'DELETE');
-      assert.equal(req.path, '/v1/feeds/feed_abc/products/p1');
+      assert.equal(req.path, '/v1/product-catalog/feeds/feed_abc/products/p1');
     });
 
     it('encodes special characters in feedId so they survive the path', async () => {
-      server.on('GET', '/v1/feeds/feed%20with%20space/products/p1', () => ({ body: { id: 'p1' } }));
+      server.on('GET', '/v1/product-catalog/feeds/feed%20with%20space/products/p1', () => ({ body: { id: 'p1' } }));
 
       const node = new BambuserProductCatalog();
       const ctx = buildExecuteContext({
@@ -142,13 +142,13 @@ describe('BambuserProductCatalog', () => {
       await node.execute.call(ctx);
 
       const req = server.requests[0]!;
-      assert.equal(req.path, '/v1/feeds/feed%20with%20space/products/p1');
+      assert.equal(req.path, '/v1/product-catalog/feeds/feed%20with%20space/products/p1');
     });
   });
 
   describe('feedId query filter for search/count (unchanged)', () => {
     it('product:search — passes feedId as a query parameter, not a path segment', async () => {
-      server.on('GET', '/v1/products', () => ({ body: { data: [], pagination: {} } }));
+      server.on('GET', '/v1/product-catalog/products', () => ({ body: { data: [], pagination: {} } }));
 
       const node = new BambuserProductCatalog();
       const ctx = buildExecuteContext({
@@ -171,12 +171,12 @@ describe('BambuserProductCatalog', () => {
       await node.execute.call(ctx);
 
       const req = server.requests[0]!;
-      assert.equal(req.path, '/v1/products');
+      assert.equal(req.path, '/v1/product-catalog/products');
       assert.equal(req.query.feedId, 'feed_a,feed_b');
     });
 
     it('product:count — passes feedId as a query parameter', async () => {
-      server.on('GET', '/v1/products/count', () => ({ body: { total: 0 } }));
+      server.on('GET', '/v1/product-catalog/products/count', () => ({ body: { total: 0 } }));
 
       const node = new BambuserProductCatalog();
       const ctx = buildExecuteContext({
@@ -193,7 +193,7 @@ describe('BambuserProductCatalog', () => {
       await node.execute.call(ctx);
 
       const req = server.requests[0]!;
-      assert.equal(req.path, '/v1/products/count');
+      assert.equal(req.path, '/v1/product-catalog/products/count');
       assert.equal(req.query.feedId, 'feed_a');
     });
   });
