@@ -17,11 +17,7 @@ COPY lib ./lib
 COPY nodes ./nodes
 RUN npx tsc --outDir /home/node/custom/n8n-nodes-bambuser && \
     cp credentials/bambuser.svg /home/node/custom/n8n-nodes-bambuser/credentials/ && \
-    cp nodes/BambuserLivecommerce/bambuser-live.svg /home/node/custom/n8n-nodes-bambuser/nodes/BambuserLivecommerce/ && \
-    cp nodes/BambuserOnDemand/bambuser-vod.svg /home/node/custom/n8n-nodes-bambuser/nodes/BambuserOnDemand/ && \
-    cp nodes/BambuserOneToOne/bambuser-live.svg /home/node/custom/n8n-nodes-bambuser/nodes/BambuserOneToOne/ && \
-    cp nodes/BambuserProductCatalog/bambuser-vod.svg /home/node/custom/n8n-nodes-bambuser/nodes/BambuserProductCatalog/ && \
-    cp nodes/BambuserShopperData/bambuser-vod.svg /home/node/custom/n8n-nodes-bambuser/nodes/BambuserShopperData/ && \
+    cp nodes/Bambuser/bambuser.svg /home/node/custom/n8n-nodes-bambuser/nodes/Bambuser/ && \
     cp nodes/BambuserWebhookTrigger/bambuser-webhook.svg /home/node/custom/n8n-nodes-bambuser/nodes/BambuserWebhookTrigger/
 
 RUN chown -R node:node /home/node/custom
