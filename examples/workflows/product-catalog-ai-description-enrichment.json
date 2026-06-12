@@ -169,14 +169,14 @@
     },
     "Loop Over Products": {
       "main": [
+        [],
         [
           {
             "node": "Generate Description",
             "type": "main",
             "index": 0
           }
-        ],
-        []
+        ]
       ]
     },
     "Gemini Chat Model": {
