@@ -20,7 +20,7 @@ export class BambuserWebhookTrigger implements INodeType {
     defaults: { name: 'Bambuser Webhook Trigger' },
     inputs: [],
     outputs: ['main'],
-    credentials: [{ name: 'bambuserApi', required: true }],
+    credentials: [{ name: 'bambuserApi', required: true, testedBy: 'bambuserApiTest' }],
     webhooks: [
       {
         name: 'default',

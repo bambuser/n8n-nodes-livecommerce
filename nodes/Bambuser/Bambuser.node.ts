@@ -1,6 +1,9 @@
 import type {
+  ICredentialsDecrypted,
+  ICredentialTestFunctions,
   IDataObject,
   IExecuteFunctions,
+  INodeCredentialTestResult,
   INodeExecutionData,
   INodeType,
   INodeTypeDescription,
@@ -45,7 +48,7 @@ export class Bambuser implements INodeType {
     defaults: { name: 'Bambuser' },
     inputs: ['main'],
     outputs: ['main'],
-    credentials: [{ name: 'bambuserApi', required: true }],
+    credentials: [{ name: 'bambuserApi', required: true, testedBy: 'bambuserApiTest' }],
     properties: [
       {
         displayName: 'Resource',
@@ -64,6 +67,42 @@ export class Bambuser implements INodeType {
     usableAsTool: true,
   };
 
+  // Custom credential test. Used because the Bambuser API has no scope-free
+  // authenticated endpoint — every route is scope-gated, so a declarative test
+  // would 403 for keys scoped to one service area. This method treats 401 as
+  // the only "invalid key" signal and 403 (auth ok, scope insufficient) as valid.
+  methods = {
+    credentialTest: {
+      async bambuserApiTest(
+        this: ICredentialTestFunctions,
+        credential: ICredentialsDecrypted,
+      ): Promise<INodeCredentialTestResult> {
+        const data = credential.data as { apiKey?: string; region?: string; baseUrl?: string };
+        const apiKey = data.apiKey ?? '';
+        const origin = resolveOrigin(data.baseUrl ?? '', data.region ?? '');
+        // Global fetch — ICredentialTestFunctions only exposes the deprecated
+        // `helpers.request`, and we require Node 24+ so the global is available.
+        let res: Response;
+        try {
+          res = await fetch(`${origin}/v1/shows?limit=1`, {
+            method: 'GET',
+            headers: { Authorization: `Token ${apiKey}` },
+          });
+        } catch (err) {
+          return { status: 'Error', message: `Connection failed: ${(err as Error).message}` };
+        }
+        if (res.status === 401) {
+          return { status: 'Error', message: 'Invalid API key' };
+        }
+        // 200 = key is valid AND has READ_SHOWS scope. 403 = key is valid but
+        // lacks READ_SHOWS, which is fine — the credential itself is usable.
+        if (res.status === 200 || res.status === 403) {
+          return { status: 'OK', message: 'Authentication successful' };
+        }
+        return { status: 'Error', message: `Connection failed (HTTP ${res.status})` };
+      },
+    },
+  };
 
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
     const items = this.getInputData();
