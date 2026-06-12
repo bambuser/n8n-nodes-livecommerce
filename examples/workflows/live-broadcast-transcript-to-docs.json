@@ -20,13 +20,13 @@
     },
     {
       "parameters": {
-        "resource": "broadcast",
+        "resource": "liveBroadcast",
         "operation": "getTranscriptions",
         "broadcastId": "={{ $json.broadcastId }}"
       },
       "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
       "name": "Bambuser Live",
-      "type": "CUSTOM.bambuserShows",
+      "type": "CUSTOM.bambuser",
       "typeVersion": 1,
       "position": [
         500,

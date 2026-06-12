@@ -20,11 +20,12 @@
     },
     {
       "parameters": {
-        "pageSize": 10
+        "pageSize": 10,
+        "resource": "video"
       },
       "id": "f3ea98be-f315-4919-a91c-5fc0c9c577f1",
       "name": "Get Recent Shoppable Videos",
-      "type": "CUSTOM.bambuserVod",
+      "type": "CUSTOM.bambuser",
       "typeVersion": 1,
       "position": [
         336,
@@ -71,7 +72,7 @@
         "options": {}
       },
       "id": "ec49a8c1-c1a2-43c4-bde2-f0723c60ab8d",
-      "name": "Gemini — Generate Shoppable Video Metadata",
+      "name": "Gemini \u2014 Generate Shoppable Video Metadata",
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1.1,
       "position": [
@@ -103,11 +104,12 @@
         "operation": "update",
         "videoId": "={{ $json.videoId }}",
         "title": "={{ $json.title }}",
-        "description": "={{ $json.description }}"
+        "description": "={{ $json.description }}",
+        "resource": "video"
       },
       "id": "2ced56d2-54ed-45d7-b650-c49104276b1e",
       "name": "Update Shoppable Video",
-      "type": "CUSTOM.bambuserVod",
+      "type": "CUSTOM.bambuser",
       "typeVersion": 1,
       "position": [
         1360,
@@ -122,7 +124,7 @@
     }
   ],
   "connections": {
-    "Gemini — Generate Shoppable Video Metadata": {
+    "Gemini \u2014 Generate Shoppable Video Metadata": {
       "ai_languageModel": [
         [
           {

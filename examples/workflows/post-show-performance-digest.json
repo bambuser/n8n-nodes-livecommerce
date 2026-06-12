@@ -46,11 +46,12 @@
     {
       "parameters": {
         "operation": "get",
-        "showId": "={{ $json.showId }}"
+        "showId": "={{ $json.showId }}",
+        "resource": "liveShow"
       },
       "id": "113aa0de-f0c5-42fa-8498-8271342a306c",
       "name": "Get Show Details",
-      "type": "CUSTOM.bambuserShows",
+      "type": "CUSTOM.bambuser",
       "typeVersion": 1,
       "position": [
         560,
@@ -65,12 +66,12 @@
     },
     {
       "parameters": {
-        "resource": "stats",
+        "resource": "liveStats",
         "showId": "={{ $('Filter Show Ended').first().json.showId }}"
       },
       "id": "dd3b9b89-3f59-4841-8aaf-5cd17847f58a",
       "name": "Get Show Stats",
-      "type": "CUSTOM.bambuserShows",
+      "type": "CUSTOM.bambuser",
       "typeVersion": 1,
       "position": [
         784,
@@ -85,7 +86,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const show  = ($('Get Show Details').first().json.data || {});\nconst stats = ($('Get Show Stats').first().json.data  || {});\nconst prods = (show.products || []).map(p => p.title).filter(Boolean).join(', ') || 'N/A';\nreturn [{\n  json: {\n    showTitle: show.title || 'Untitled',\n    prompt: `Write a concise post-show performance digest for a live shopping event.\n\nShow: \"${show.title || 'Untitled'}\"\nProducts Featured: ${prods}\n\nMetrics:\n• Views: ${stats.views ?? 0}\n• Unique Viewers: ${stats.uniqueViewers ?? 0}\n• Add-to-Cart Clicks: ${stats.addToCartClicks ?? 0}\n• Purchases: ${stats.purchases ?? 0}\n• Revenue: $${stats.revenue ?? 0}\n\nProvide 4 bullet-point highlights and 1 actionable recommendation.\nKeep it brief and data-driven. Plain text, no markdown headers.`\n  }\n}];\n"
+        "jsCode": "const show  = ($('Get Show Details').first().json.data || {});\nconst stats = ($('Get Show Stats').first().json.data  || {});\nconst prods = (show.products || []).map(p => p.title).filter(Boolean).join(', ') || 'N/A';\nreturn [{\n  json: {\n    showTitle: show.title || 'Untitled',\n    prompt: `Write a concise post-show performance digest for a live shopping event.\n\nShow: \"${show.title || 'Untitled'}\"\nProducts Featured: ${prods}\n\nMetrics:\n\u2022 Views: ${stats.views ?? 0}\n\u2022 Unique Viewers: ${stats.uniqueViewers ?? 0}\n\u2022 Add-to-Cart Clicks: ${stats.addToCartClicks ?? 0}\n\u2022 Purchases: ${stats.purchases ?? 0}\n\u2022 Revenue: $${stats.revenue ?? 0}\n\nProvide 4 bullet-point highlights and 1 actionable recommendation.\nKeep it brief and data-driven. Plain text, no markdown headers.`\n  }\n}];\n"
       },
       "id": "efc47bc9-e0ac-4587-a808-2d681a18f97d",
       "name": "Build Stats Prompt",
@@ -117,7 +118,7 @@
         "options": {}
       },
       "id": "298bc141-4889-4431-949b-b4de8488501b",
-      "name": "Gemini — Write Performance Digest",
+      "name": "Gemini \u2014 Write Performance Digest",
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1.1,
       "position": [
@@ -133,7 +134,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const digest = ($input.first().json.text || $input.first().json.output || '').trim();\nconst title  = $('Build Stats Prompt').first().json.showTitle;\nreturn [{ json: { text: `📊 *Post-show digest — ${title}*\\n\\n${digest}` } }];\n"
+        "jsCode": "const digest = ($input.first().json.text || $input.first().json.output || '').trim();\nconst title  = $('Build Stats Prompt').first().json.showTitle;\nreturn [{ json: { text: `\ud83d\udcca *Post-show digest \u2014 ${title}*\\n\\n${digest}` } }];\n"
       },
       "id": "18d1b666-78ca-4e39-91ff-ad1951919e0c",
       "name": "Format Digest",
@@ -170,7 +171,7 @@
     }
   ],
   "connections": {
-    "Gemini — Write Performance Digest": {
+    "Gemini \u2014 Write Performance Digest": {
       "ai_languageModel": [
         [
           {

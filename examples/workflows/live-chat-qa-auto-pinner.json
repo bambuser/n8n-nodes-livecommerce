@@ -29,11 +29,12 @@
     },
     {
       "parameters": {
-        "limit": 5
+        "limit": 5,
+        "resource": "liveShow"
       },
       "id": "17f2e715-1550-4d87-824f-2214bc1dae13",
       "name": "Get Active Shows",
-      "type": "CUSTOM.bambuserShows",
+      "type": "CUSTOM.bambuser",
       "typeVersion": 1,
       "position": [
         336,
@@ -63,11 +64,12 @@
       "parameters": {
         "operation": "getChatMessages",
         "showId": "={{ $json.showId }}",
-        "limit": 30
+        "limit": 30,
+        "resource": "liveShow"
       },
       "id": "465688b9-b6ce-47b2-a330-04c318e06aea",
       "name": "Get Chat Messages",
-      "type": "CUSTOM.bambuserShows",
+      "type": "CUSTOM.bambuser",
       "typeVersion": 1,
       "position": [
         784,
@@ -115,7 +117,7 @@
         "options": {}
       },
       "id": "3d46fae5-601f-4679-a341-a309848f66e2",
-      "name": "Gemini — Classify Chat Messages",
+      "name": "Gemini \u2014 Classify Chat Messages",
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1.1,
       "position": [
@@ -147,11 +149,12 @@
       "parameters": {
         "operation": "createPinnedComment",
         "showId": "={{ $json.showId }}",
-        "chatMessageId": "={{ $json.chatMessageId }}"
+        "chatMessageId": "={{ $json.chatMessageId }}",
+        "resource": "liveShow"
       },
       "id": "9aa2d190-829c-41c5-8177-d8cff8cdea62",
       "name": "Pin Top Question",
-      "type": "CUSTOM.bambuserShows",
+      "type": "CUSTOM.bambuser",
       "typeVersion": 1,
       "position": [
         1808,
@@ -166,7 +169,7 @@
     }
   ],
   "connections": {
-    "Gemini — Classify Chat Messages": {
+    "Gemini \u2014 Classify Chat Messages": {
       "ai_languageModel": [
         [
           {

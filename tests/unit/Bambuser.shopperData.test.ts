@@ -3,7 +3,7 @@ import { strict as assert } from 'node:assert';
 import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 
-import { BambuserShopperData } from '../../nodes/BambuserShopperData/BambuserShopperData.node';
+import { Bambuser } from '../../nodes/Bambuser/Bambuser.node';
 import { buildExecuteContext } from '../helpers/executeContext';
 import { startMockServer } from '../helpers/mockServer';
 
@@ -11,7 +11,7 @@ const getManyFixture = JSON.parse(
   readFileSync(new URL('../fixtures/shopperData.getMany.json', import.meta.url), 'utf8'),
 );
 
-describe('BambuserShopperData', () => {
+describe('Bambuser — shopperData resource', () => {
   let server: Awaited<ReturnType<typeof startMockServer>>;
 
   beforeEach(async () => {
@@ -25,7 +25,7 @@ describe('BambuserShopperData', () => {
   it('shopperData:getMany — passes limit/after through and returns the spec response shape', async () => {
     server.on('GET', '/v1/shopper-data', () => ({ body: getManyFixture }));
 
-    const node = new BambuserShopperData();
+    const node = new Bambuser();
     const ctx = buildExecuteContext({
       credential: { apiKey: 'test-key', region: 'eu', baseUrl: server.url },
       parameters: { resource: 'shopperData', operation: 'getMany', limit: 25, after: '' },
@@ -50,7 +50,7 @@ describe('BambuserShopperData', () => {
   it('shopperData:delete — sends DELETE to /v1/shopper-data/{id}, 204 No Content', async () => {
     server.on('DELETE', '/v1/shopper-data/rec_abc', () => ({ status: 204 }));
 
-    const node = new BambuserShopperData();
+    const node = new Bambuser();
     const ctx = buildExecuteContext({
       credential: { apiKey: 'test-key', region: 'eu', baseUrl: server.url },
       parameters: { resource: 'shopperData', operation: 'delete', recordId: 'rec_abc' },

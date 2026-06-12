@@ -3,7 +3,7 @@ import { strict as assert } from 'node:assert';
 import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 
-import { BambuserShows } from '../../nodes/BambuserShows/BambuserShows.node';
+import { Bambuser } from '../../nodes/Bambuser/Bambuser.node';
 import { buildExecuteContext } from '../helpers/executeContext';
 import { startMockServer } from '../helpers/mockServer';
 
@@ -11,7 +11,7 @@ const showGetManyFixture = JSON.parse(
   readFileSync(new URL('../fixtures/show.getMany.json', import.meta.url), 'utf8'),
 );
 
-describe('BambuserShows', () => {
+describe('Bambuser — live resources', () => {
   let server: Awaited<ReturnType<typeof startMockServer>>;
 
   beforeEach(async () => {
@@ -22,13 +22,13 @@ describe('BambuserShows', () => {
     await server.close();
   });
 
-  it('show:getMany — sends GET /v1/shows with limit, returns { results } per spec', async () => {
+  it('liveShow:getMany — sends GET /v1/shows with limit, returns { results } per spec', async () => {
     server.on('GET', '/v1/shows', () => ({ body: showGetManyFixture }));
 
-    const node = new BambuserShows();
+    const node = new Bambuser();
     const ctx = buildExecuteContext({
       credential: { apiKey: 'test-key', region: 'eu', baseUrl: server.url },
-      parameters: { resource: 'show', operation: 'getMany', limit: 5 },
+      parameters: { resource: 'liveShow', operation: 'getMany', limit: 5 },
     });
 
     const result = await node.execute.call(ctx);

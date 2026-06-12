@@ -20,11 +20,12 @@
     },
     {
       "parameters": {
-        "limit": 10
+        "limit": 10,
+        "resource": "liveShow"
       },
       "id": "ff7d970c-3c8c-4cf9-8850-5a1c814ca578",
       "name": "Get Shows",
-      "type": "CUSTOM.bambuserShows",
+      "type": "CUSTOM.bambuser",
       "typeVersion": 1,
       "position": [
         336,
@@ -53,11 +54,12 @@
     {
       "parameters": {
         "operation": "getProducts",
-        "showId": "={{ $json.showId }}"
+        "showId": "={{ $json.showId }}",
+        "resource": "liveShow"
       },
       "id": "e2ed90ba-aa09-4faa-8603-9ad6cca3e7e1",
       "name": "Get Show Products",
-      "type": "CUSTOM.bambuserShows",
+      "type": "CUSTOM.bambuser",
       "typeVersion": 1,
       "position": [
         784,
@@ -104,7 +106,7 @@
         "options": {}
       },
       "id": "68b09424-f8d5-453c-90d3-31ebba7c10b2",
-      "name": "Gemini — Write Show Description",
+      "name": "Gemini \u2014 Write Show Description",
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1.1,
       "position": [
@@ -139,11 +141,12 @@
           "values": {
             "description": "={{ $json.description }}"
           }
-        }
+        },
+        "resource": "liveShow"
       },
       "id": "06216d95-68c6-4a95-860c-1570f0a74856",
       "name": "Update Show",
-      "type": "CUSTOM.bambuserShows",
+      "type": "CUSTOM.bambuser",
       "typeVersion": 1,
       "position": [
         1808,
@@ -158,7 +161,7 @@
     }
   ],
   "connections": {
-    "Gemini — Write Show Description": {
+    "Gemini \u2014 Write Show Description": {
       "ai_languageModel": [
         [
           {

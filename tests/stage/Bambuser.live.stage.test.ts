@@ -2,16 +2,16 @@
 import { strict as assert } from 'node:assert';
 import { describe, it } from 'node:test';
 
-import { BambuserShows } from '../../nodes/BambuserShows/BambuserShows.node';
+import { Bambuser } from '../../nodes/Bambuser/Bambuser.node';
 import { buildExecuteContext } from '../helpers/executeContext';
 import { skipIfNoStageKey, stageCredential } from '../helpers/stage';
 
-describe('BambuserShows (stage)', { skip: skipIfNoStageKey() }, () => {
-  it('show:getMany — fixture org responds with a data array', async () => {
-    const node = new BambuserShows();
+describe('Bambuser — live resources (stage)', { skip: skipIfNoStageKey() }, () => {
+  it('liveShow:getMany — fixture org responds with a data array', async () => {
+    const node = new Bambuser();
     const ctx = buildExecuteContext({
       credential: stageCredential(),
-      parameters: { resource: 'show', operation: 'getMany', limit: 5 },
+      parameters: { resource: 'liveShow', operation: 'getMany', limit: 5 },
     });
 
     const result = await node.execute.call(ctx);

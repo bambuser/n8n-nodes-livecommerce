@@ -31,7 +31,7 @@
       },
       "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
       "name": "List Shoppable Videos",
-      "type": "CUSTOM.bambuserVod",
+      "type": "CUSTOM.bambuser",
       "typeVersion": 1,
       "position": [
         500,
@@ -119,7 +119,7 @@
       },
       "id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
       "name": "Update Video Description",
-      "type": "CUSTOM.bambuserVod",
+      "type": "CUSTOM.bambuser",
       "typeVersion": 1,
       "position": [
         1500,

@@ -43,8 +43,8 @@
     "dev": "n8n-node dev",
     "lint": "n8n-node lint",
     "lint:fix": "n8n-node lint --fix",
-    "test": "node --import tsx --test \"tests/unit/**/*.test.ts\"",
-    "test:stage": "node --env-file-if-exists=.env.stage --import tsx --test \"tests/stage/**/*.test.ts\"",
+    "test": "node --import tsx --test tests/unit/*.test.ts",
+    "test:stage": "node --env-file-if-exists=.env.stage --import tsx --test tests/stage/*.test.ts",
     "release": "n8n-node release",
     "prepublishOnly": "n8n-node prerelease"
   },
@@ -55,11 +55,7 @@
       "dist/credentials/BambuserApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/BambuserShows/BambuserShows.node.js",
-      "dist/nodes/BambuserVod/BambuserVod.node.js",
-      "dist/nodes/BambuserCalls/BambuserCalls.node.js",
-      "dist/nodes/BambuserProductCatalog/BambuserProductCatalog.node.js",
-      "dist/nodes/BambuserShopperData/BambuserShopperData.node.js",
+      "dist/nodes/Bambuser/Bambuser.node.js",
       "dist/nodes/BambuserWebhookTrigger/BambuserWebhookTrigger.node.js"
     ]
   },

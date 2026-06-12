@@ -1,71 +1,27 @@
 import type {
-  IDataObject,
   IExecuteFunctions,
   IHttpRequestMethods,
-  IHttpRequestOptions,
-  INodeExecutionData,
-  INodeType,
-  INodeTypeDescription,
+  INodeProperties,
   GenericValue,
 } from 'n8n-workflow';
-import { NodeOperationError } from 'n8n-workflow';
-import { resolveOrigin } from '../../lib/resolveOrigin';
-
-type ShowOp =
-  | 'get' | 'getMany' | 'create' | 'update' | 'delete' | 'getBroadcasts'
-  | 'getChatMessages' | 'sendChatMessage' | 'updateChatMessage' | 'getChatTranscripts'
-  | 'getPinnedComments' | 'createPinnedComment' | 'updatePinnedComment' | 'deletePinnedComment'
-  | 'getHighlights' | 'addHighlight' | 'updateHighlight' | 'deleteHighlight'
-  | 'getProducts' | 'addProduct' | 'addProductsBatch' | 'reorderProducts' | 'removeProduct'
-  | 'getAssets' | 'deleteAsset'
-  | 'addChannel' | 'updateChannels' | 'removeChannel'
-  | 'addTag' | 'updateTags' | 'removeTag'
-  | 'getExamples';
-
-type ProductOp =
-  | 'get' | 'getMany' | 'update' | 'delete'
-  | 'getHighlighted' | 'getHighlightedShows' | 'getHighlightedShowsByRefs' | 'getHighlightedShowsById';
-
-type ChannelOp = 'create' | 'get';
-type TagOp = 'getMany' | 'create' | 'get' | 'update';
-type UserOp = 'getMany' | 'invite' | 'update' | 'delete' | 'getAssets' | 'deleteAsset';
-type StatsOp = 'getShow' | 'getShows' | 'getActivity' | 'getShowOrders' | 'getShowsOrders' | 'getActivityOrders' | 'getShowTraffic' | 'getShowsTraffic';
-type WebhookOp = 'create' | 'getEvent';
-type BroadcastOp = 'download' | 'getTranscriptions';
-
-type OperationKey =
-  | `show:${ShowOp}`
-  | `product:${ProductOp}`
-  | `channel:${ChannelOp}`
-  | `tag:${TagOp}`
-  | `user:${UserOp}`
-  | `stats:${StatsOp}`
-  | `webhook:${WebhookOp}`
-  | `broadcast:${BroadcastOp}`;
-
-type OperationHandler = (i: number) => Promise<IHttpRequestOptions>;
+import type { HandlerMap } from '../shared/types';
+import { filterEmpty } from '../shared/filterEmpty';
 
 const splitList = (s: string): string[] => s.split(',').map(t => t.trim()).filter(Boolean);
-
-const filterEmpty = (obj: Record<string, unknown>): IDataObject =>
-  Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== '' && v !== undefined && v !== null)) as IDataObject;
 
 const parseBoolOption = (v: string): boolean | undefined =>
   v === 'true' ? true : v === 'false' ? false : undefined;
 
-const buildOperationHandlers = (
-  ctx: IExecuteFunctions,
-  baseUrl: string,
-): Record<OperationKey, OperationHandler> => ({
+export const handlers = (ctx: IExecuteFunctions, baseUrl: string): HandlerMap => ({
 
   // ─── Show ─────────────────────────────────────────────────────────────────
 
-  'show:get': async (i) => ({
+  'liveShow:get': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}`,
   }),
 
-  'show:getMany': async (i) => ({
+  'liveShow:getMany': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/shows`,
     qs: filterEmpty({
@@ -79,7 +35,7 @@ const buildOperationHandlers = (
     }),
   }),
 
-  'show:create': async (i) => {
+  'liveShow:create': async (i) => {
     const fields = ctx.getNodeParameter('fields', i) as { values?: Record<string, unknown> };
     const extra = filterEmpty(fields.values ?? {});
     if (typeof extra.published === 'string') extra.published = parseBoolOption(extra.published as string);
@@ -91,7 +47,7 @@ const buildOperationHandlers = (
     };
   },
 
-  'show:update': async (i) => {
+  'liveShow:update': async (i) => {
     const showId = ctx.getNodeParameter('showId', i) as string;
     const fields = ctx.getNodeParameter('fields', i) as { values?: Record<string, unknown> };
     const body = filterEmpty(fields.values ?? {});
@@ -105,18 +61,18 @@ const buildOperationHandlers = (
     };
   },
 
-  'show:delete': async (i) => ({
+  'liveShow:delete': async (i) => ({
     method: 'DELETE' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}`,
     qs: { removeMedia: true, removeChatlog: true },
   }),
 
-  'show:getBroadcasts': async (i) => ({
+  'liveShow:getBroadcasts': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/broadcasts`,
   }),
 
-  'show:getChatMessages': async (i) => ({
+  'liveShow:getChatMessages': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/chat-messages`,
     qs: filterEmpty({
@@ -125,7 +81,7 @@ const buildOperationHandlers = (
     }),
   }),
 
-  'show:sendChatMessage': async (i) => {
+  'liveShow:sendChatMessage': async (i) => {
     const replyToId = ctx.getNodeParameter('replyToId', i, '') as string;
     return {
       method: 'POST' as IHttpRequestMethods,
@@ -140,19 +96,19 @@ const buildOperationHandlers = (
     };
   },
 
-  'show:updateChatMessage': async (i) => ({
+  'liveShow:updateChatMessage': async (i) => ({
     method: 'PATCH' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/chat-messages/${ctx.getNodeParameter('chatMessageId', i) as string}`,
     headers: { 'Content-Type': 'application/json' },
     body: { status: ctx.getNodeParameter('chatStatus', i) as string },
   }),
 
-  'show:getChatTranscripts': async (i) => ({
+  'liveShow:getChatTranscripts': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/chat-transcripts`,
   }),
 
-  'show:getPinnedComments': async (i) => ({
+  'liveShow:getPinnedComments': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/pinned-comments`,
     qs: filterEmpty({
@@ -162,26 +118,26 @@ const buildOperationHandlers = (
     }),
   }),
 
-  'show:createPinnedComment': async (i) => ({
+  'liveShow:createPinnedComment': async (i) => ({
     method: 'POST' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/pinned-comments`,
     headers: { 'Content-Type': 'application/json' },
     body: { chatMessage: { id: ctx.getNodeParameter('chatMessageId', i) as string } },
   }),
 
-  'show:updatePinnedComment': async (i) => ({
+  'liveShow:updatePinnedComment': async (i) => ({
     method: 'PATCH' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/pinned-comments/${ctx.getNodeParameter('pinnedCommentId', i) as string}`,
     headers: { 'Content-Type': 'application/json' },
     body: { chatMessage: { id: ctx.getNodeParameter('chatMessageId', i) as string } },
   }),
 
-  'show:deletePinnedComment': async (i) => ({
+  'liveShow:deletePinnedComment': async (i) => ({
     method: 'DELETE' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/pinned-comments/${ctx.getNodeParameter('pinnedCommentId', i) as string}`,
   }),
 
-  'show:getHighlights': async (i) => ({
+  'liveShow:getHighlights': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/highlights`,
     qs: filterEmpty({
@@ -191,7 +147,7 @@ const buildOperationHandlers = (
     }),
   }),
 
-  'show:addHighlight': async (i) => {
+  'liveShow:addHighlight': async (i) => {
     const startRel = ctx.getNodeParameter('startRel', i, '') as number | '';
     return {
       method: 'POST' as IHttpRequestMethods,
@@ -204,110 +160,110 @@ const buildOperationHandlers = (
     };
   },
 
-  'show:updateHighlight': async (i) => ({
+  'liveShow:updateHighlight': async (i) => ({
     method: 'PATCH' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/highlights/${ctx.getNodeParameter('highlightId', i) as string}`,
     headers: { 'Content-Type': 'application/json' },
     body: { products: splitList(ctx.getNodeParameter('products', i, '') as string) },
   }),
 
-  'show:deleteHighlight': async (i) => ({
+  'liveShow:deleteHighlight': async (i) => ({
     method: 'DELETE' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/highlights/${ctx.getNodeParameter('highlightId', i) as string}`,
   }),
 
-  'show:getProducts': async (i) => ({
+  'liveShow:getProducts': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/products`,
   }),
 
-  'show:addProduct': async (i) => ({
+  'liveShow:addProduct': async (i) => ({
     method: 'POST' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/products`,
     headers: { 'Content-Type': 'application/json' },
     body: { publicUrl: ctx.getNodeParameter('publicUrl', i) as string },
   }),
 
-  'show:addProductsBatch': async (i) => ({
+  'liveShow:addProductsBatch': async (i) => ({
     method: 'POST' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/products/batch`,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.parse(ctx.getNodeParameter('productsJson', i) as string) as GenericValue[],
   }),
 
-  'show:reorderProducts': async (i) => ({
+  'liveShow:reorderProducts': async (i) => ({
     method: 'PATCH' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/products`,
     headers: { 'Content-Type': 'application/json' },
     body: { products: splitList(ctx.getNodeParameter('products', i) as string) },
   }),
 
-  'show:removeProduct': async (i) => ({
+  'liveShow:removeProduct': async (i) => ({
     method: 'DELETE' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/products/${ctx.getNodeParameter('productId', i) as string}`,
   }),
 
-  'show:getAssets': async (i) => ({
+  'liveShow:getAssets': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/assets`,
   }),
 
-  'show:deleteAsset': async (i) => ({
+  'liveShow:deleteAsset': async (i) => ({
     method: 'DELETE' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/assets/${ctx.getNodeParameter('assetId', i) as string}`,
   }),
 
-  'show:addChannel': async (i) => ({
+  'liveShow:addChannel': async (i) => ({
     method: 'POST' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/channels`,
     headers: { 'Content-Type': 'application/json' },
     body: { id: ctx.getNodeParameter('channelId', i) as string },
   }),
 
-  'show:updateChannels': async (i) => ({
+  'liveShow:updateChannels': async (i) => ({
     method: 'PUT' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/channels`,
     headers: { 'Content-Type': 'application/json' },
     body: { data: splitList(ctx.getNodeParameter('channelIds', i) as string).map(id => ({ id })) },
   }),
 
-  'show:removeChannel': async (i) => ({
+  'liveShow:removeChannel': async (i) => ({
     method: 'DELETE' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/channels/${ctx.getNodeParameter('channelId', i) as string}`,
   }),
 
-  'show:addTag': async (i) => ({
+  'liveShow:addTag': async (i) => ({
     method: 'POST' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/tags`,
     headers: { 'Content-Type': 'application/json' },
     body: { id: ctx.getNodeParameter('tagId', i) as string },
   }),
 
-  'show:updateTags': async (i) => ({
+  'liveShow:updateTags': async (i) => ({
     method: 'PUT' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/tags`,
     headers: { 'Content-Type': 'application/json' },
     body: { data: splitList(ctx.getNodeParameter('tagIds', i) as string).map(id => ({ id })) },
   }),
 
-  'show:removeTag': async (i) => ({
+  'liveShow:removeTag': async (i) => ({
     method: 'DELETE' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/tags/${ctx.getNodeParameter('tagId', i) as string}`,
   }),
 
-  'show:getExamples': async (i) => ({
+  'liveShow:getExamples': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/shows/${ctx.getNodeParameter('showId', i) as string}/examples`,
   }),
 
   // ─── Product ──────────────────────────────────────────────────────────────
 
-  'product:get': async (i) => ({
+  'liveProduct:get': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/products/${ctx.getNodeParameter('productId', i) as string}`,
   }),
 
-  'product:getMany': async (i) => ({
+  'liveProduct:getMany': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/products`,
     qs: filterEmpty({
@@ -316,7 +272,7 @@ const buildOperationHandlers = (
     }),
   }),
 
-  'product:update': async (i) => {
+  'liveProduct:update': async (i) => {
     const fields = ctx.getNodeParameter('fields', i) as { values?: Record<string, unknown> };
     return {
       method: 'PATCH' as IHttpRequestMethods,
@@ -326,12 +282,12 @@ const buildOperationHandlers = (
     };
   },
 
-  'product:delete': async (i) => ({
+  'liveProduct:delete': async (i) => ({
     method: 'DELETE' as IHttpRequestMethods,
     url: `${baseUrl}/products/${ctx.getNodeParameter('productId', i) as string}`,
   }),
 
-  'product:getHighlighted': async (i) => ({
+  'liveProduct:getHighlighted': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/products/highlighted`,
     qs: filterEmpty({
@@ -341,40 +297,40 @@ const buildOperationHandlers = (
     }),
   }),
 
-  'product:getHighlightedShows': async (i) => ({
+  'liveProduct:getHighlightedShows': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/products/highlighted/shows`,
     qs: { productReference: ctx.getNodeParameter('productReference', i) as string },
   }),
 
-  'product:getHighlightedShowsByRefs': async (i) => ({
+  'liveProduct:getHighlightedShowsByRefs': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/products/highlighted/shows/by-references`,
     qs: { productReference: splitList(ctx.getNodeParameter('productReferences', i) as string) },
   }),
 
-  'product:getHighlightedShowsById': async (i) => ({
+  'liveProduct:getHighlightedShowsById': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/products/${ctx.getNodeParameter('productId', i) as string}/highlighted/shows`,
   }),
 
   // ─── Channel ──────────────────────────────────────────────────────────────
 
-  'channel:create': async (i) => ({
+  'liveChannel:create': async (i) => ({
     method: 'POST' as IHttpRequestMethods,
     url: `${baseUrl}/channels`,
     headers: { 'Content-Type': 'application/json' },
     body: { title: ctx.getNodeParameter('title', i) as string },
   }),
 
-  'channel:get': async (i) => ({
+  'liveChannel:get': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/channels/${ctx.getNodeParameter('channelId', i) as string}`,
   }),
 
   // ─── Tag ──────────────────────────────────────────────────────────────────
 
-  'tag:getMany': async (i) => ({
+  'liveTag:getMany': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/tags`,
     qs: filterEmpty({
@@ -383,19 +339,19 @@ const buildOperationHandlers = (
     }),
   }),
 
-  'tag:create': async (i) => ({
+  'liveTag:create': async (i) => ({
     method: 'POST' as IHttpRequestMethods,
     url: `${baseUrl}/tags`,
     headers: { 'Content-Type': 'application/json' },
     body: { name: ctx.getNodeParameter('name', i) as string },
   }),
 
-  'tag:get': async (i) => ({
+  'liveTag:get': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/tags/${ctx.getNodeParameter('tagId', i) as string}`,
   }),
 
-  'tag:update': async (i) => ({
+  'liveTag:update': async (i) => ({
     method: 'PATCH' as IHttpRequestMethods,
     url: `${baseUrl}/tags/${ctx.getNodeParameter('tagId', i) as string}`,
     headers: { 'Content-Type': 'application/json' },
@@ -404,7 +360,7 @@ const buildOperationHandlers = (
 
   // ─── User ─────────────────────────────────────────────────────────────────
 
-  'user:getMany': async (i) => ({
+  'liveUser:getMany': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/users`,
     qs: filterEmpty({
@@ -416,7 +372,7 @@ const buildOperationHandlers = (
     }),
   }),
 
-  'user:invite': async (i) => ({
+  'liveUser:invite': async (i) => ({
     method: 'POST' as IHttpRequestMethods,
     url: `${baseUrl}/users`,
     headers: { 'Content-Type': 'application/json' },
@@ -430,7 +386,7 @@ const buildOperationHandlers = (
     }),
   }),
 
-  'user:update': async (i) => {
+  'liveUser:update': async (i) => {
     const fields = ctx.getNodeParameter('fields', i) as { values?: Record<string, unknown> };
     const body: Record<string, unknown> = filterEmpty(fields.values ?? {});
     if (typeof body.roles === 'string') body.roles = splitList(body.roles as string);
@@ -442,64 +398,64 @@ const buildOperationHandlers = (
     };
   },
 
-  'user:delete': async (i) => ({
+  'liveUser:delete': async (i) => ({
     method: 'DELETE' as IHttpRequestMethods,
     url: `${baseUrl}/users/${ctx.getNodeParameter('userId', i) as string}`,
   }),
 
-  'user:getAssets': async (i) => ({
+  'liveUser:getAssets': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/users/${ctx.getNodeParameter('userId', i) as string}/assets`,
   }),
 
-  'user:deleteAsset': async (i) => ({
+  'liveUser:deleteAsset': async (i) => ({
     method: 'DELETE' as IHttpRequestMethods,
     url: `${baseUrl}/users/${ctx.getNodeParameter('userId', i) as string}/assets/${ctx.getNodeParameter('assetId', i) as string}`,
   }),
 
   // ─── Stats ────────────────────────────────────────────────────────────────
 
-  'stats:getShow': async (i) => ({
+  'liveStats:getShow': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/stats/show/${ctx.getNodeParameter('showId', i) as string}`,
   }),
 
-  'stats:getShows': async (i) => ({
+  'liveStats:getShows': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/stats/shows`,
     qs: filterEmpty({ from: ctx.getNodeParameter('from', i, '') as string, to: ctx.getNodeParameter('to', i, '') as string }),
   }),
 
-  'stats:getActivity': async (i) => ({
+  'liveStats:getActivity': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/stats/activity`,
     qs: filterEmpty({ from: ctx.getNodeParameter('from', i, '') as string, to: ctx.getNodeParameter('to', i, '') as string }),
   }),
 
-  'stats:getShowOrders': async (i) => ({
+  'liveStats:getShowOrders': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/stats/show/${ctx.getNodeParameter('showId', i) as string}/orders`,
     qs: filterEmpty({ limit: ctx.getNodeParameter('limit', i, 10) as number, after: ctx.getNodeParameter('after', i, '') as string }),
   }),
 
-  'stats:getShowsOrders': async (i) => ({
+  'liveStats:getShowsOrders': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/stats/shows/orders`,
     qs: filterEmpty({ from: ctx.getNodeParameter('from', i, '') as string, to: ctx.getNodeParameter('to', i, '') as string, limit: ctx.getNodeParameter('limit', i, 10) as number, after: ctx.getNodeParameter('after', i, '') as string }),
   }),
 
-  'stats:getActivityOrders': async (i) => ({
+  'liveStats:getActivityOrders': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/stats/activity/orders`,
     qs: filterEmpty({ from: ctx.getNodeParameter('from', i, '') as string, to: ctx.getNodeParameter('to', i, '') as string, limit: ctx.getNodeParameter('limit', i, 10) as number, after: ctx.getNodeParameter('after', i, '') as string }),
   }),
 
-  'stats:getShowTraffic': async (i) => ({
+  'liveStats:getShowTraffic': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/stats/show/${ctx.getNodeParameter('showId', i) as string}/traffic-acquisition`,
   }),
 
-  'stats:getShowsTraffic': async (i) => ({
+  'liveStats:getShowsTraffic': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/stats/traffic-acquisition`,
     qs: filterEmpty({ from: ctx.getNodeParameter('from', i, '') as string, to: ctx.getNodeParameter('to', i, '') as string }),
@@ -507,7 +463,7 @@ const buildOperationHandlers = (
 
   // ─── Webhook ──────────────────────────────────────────────────────────────
 
-  'webhook:create': async (i) => ({
+  'liveWebhook:create': async (i) => ({
     method: 'POST' as IHttpRequestMethods,
     url: `${baseUrl}/webhooks`,
     headers: { 'Content-Type': 'application/json' },
@@ -519,30 +475,28 @@ const buildOperationHandlers = (
     },
   }),
 
-  'webhook:getEvent': async (i) => ({
+  'liveWebhook:getEvent': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/webhooks/${ctx.getNodeParameter('eventId', i) as string}`,
   }),
 
   // ─── Broadcast ────────────────────────────────────────────────────────────
 
-  'broadcast:download': async (i) => ({
+  'liveBroadcast:download': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/broadcasts/${ctx.getNodeParameter('broadcastId', i) as string}/download`,
     qs: filterEmpty({ format: ctx.getNodeParameter('downloadFormat', i, '') as string }),
   }),
 
-  'broadcast:getTranscriptions': async (i) => ({
+  'liveBroadcast:getTranscriptions': async (i) => ({
     method: 'GET' as IHttpRequestMethods,
     url: `${baseUrl}/broadcasts/${ctx.getNodeParameter('broadcastId', i) as string}/transcriptions`,
     qs: filterEmpty({ cursor: ctx.getNodeParameter('transcriptionCursor', i, '') as string }),
   }),
 });
 
-// ─── Shared displayOptions helpers ────────────────────────────────────────────
-
 // Show operations that require a single showId path param
-const SHOW_ID_OPS: ShowOp[] = [
+const SHOW_ID_OPS = [
   'get', 'update', 'delete', 'getBroadcasts',
   'getChatMessages', 'sendChatMessage', 'updateChatMessage', 'getChatTranscripts',
   'getPinnedComments', 'createPinnedComment', 'updatePinnedComment', 'deletePinnedComment',
@@ -554,44 +508,9 @@ const SHOW_ID_OPS: ShowOp[] = [
   'getExamples',
 ];
 
-const STATS_SHOW_ID_OPS: StatsOp[] = ['getShow', 'getShowOrders', 'getShowTraffic'];
+const STATS_SHOW_ID_OPS = ['getShow', 'getShowOrders', 'getShowTraffic'];
 
-export class BambuserShows implements INodeType {
-  description: INodeTypeDescription = {
-    // `displayName` is the UI label and may follow public product branding freely.
-    // `name` is the persisted node type (`<package>.<name>`) baked into every saved
-    // workflow — changing it breaks existing flows, so it is frozen to the internal
-    // concept (shows) and must NOT track marketing renames.
-    displayName: 'Bambuser Live',
-    name: 'bambuserShows',
-    icon: 'file:bambuser-live.svg',
-    group: ['transform'],
-    version: 1,
-    subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-    description: 'Interact with the Bambuser Live API',
-    defaults: { name: 'Bambuser Live' },
-    inputs: ['main'],
-    outputs: ['main'],
-    credentials: [{ name: 'bambuserApi', required: true }],
-    properties: [
-      // ── Resource ───────────────────────────────────────────────────────────
-      {
-        displayName: 'Resource',
-        name: 'resource',
-        type: 'options',
-        noDataExpression: true,
-        options: [
-          { name: 'Broadcast', value: 'broadcast' },
-          { name: 'Channel', value: 'channel' },
-          { name: 'Product', value: 'product' },
-          { name: 'Show', value: 'show' },
-          { name: 'Stat', value: 'stats' },
-          { name: 'Tag', value: 'tag' },
-          { name: 'User', value: 'user' },
-          { name: 'Webhook', value: 'webhook' },
-        ],
-        default: 'show',
-      },
+export const properties: INodeProperties[] = [
 
       // ── Operation: Broadcast ───────────────────────────────────────────────
       {
@@ -599,7 +518,7 @@ export class BambuserShows implements INodeType {
         name: 'operation',
         type: 'options',
         noDataExpression: true,
-        displayOptions: { show: { resource: ['broadcast'] } },
+        displayOptions: { show: { resource: ['liveBroadcast'] } },
         options: [
           { name: 'Download', value: 'download', action: 'Get a download link for a broadcast recording' },
           { name: 'Get Transcriptions', value: 'getTranscriptions', action: 'Get transcriptions for a broadcast' },
@@ -613,7 +532,7 @@ export class BambuserShows implements INodeType {
         name: 'operation',
         type: 'options',
         noDataExpression: true,
-        displayOptions: { show: { resource: ['show'] } },
+        displayOptions: { show: { resource: ['liveShow'] } },
         options: [
           { name: 'Add Channel', value: 'addChannel', action: 'Add a channel to a show' },
           { name: 'Add Highlight', value: 'addHighlight', action: 'Add a product highlight to a show' },
@@ -657,7 +576,7 @@ export class BambuserShows implements INodeType {
         name: 'operation',
         type: 'options',
         noDataExpression: true,
-        displayOptions: { show: { resource: ['product'] } },
+        displayOptions: { show: { resource: ['liveProduct'] } },
         options: [
           { name: 'Delete', value: 'delete', action: 'Delete a product' },
           { name: 'Get', value: 'get', action: 'Get a product by ID' },
@@ -677,7 +596,7 @@ export class BambuserShows implements INodeType {
         name: 'operation',
         type: 'options',
         noDataExpression: true,
-        displayOptions: { show: { resource: ['channel'] } },
+        displayOptions: { show: { resource: ['liveChannel'] } },
         options: [
           { name: 'Create', value: 'create', action: 'Create a channel' },
           { name: 'Get', value: 'get', action: 'Get a channel by ID' },
@@ -691,7 +610,7 @@ export class BambuserShows implements INodeType {
         name: 'operation',
         type: 'options',
         noDataExpression: true,
-        displayOptions: { show: { resource: ['tag'] } },
+        displayOptions: { show: { resource: ['liveTag'] } },
         options: [
           { name: 'Create', value: 'create', action: 'Create a tag' },
           { name: 'Get', value: 'get', action: 'Get a tag by ID' },
@@ -707,7 +626,7 @@ export class BambuserShows implements INodeType {
         name: 'operation',
         type: 'options',
         noDataExpression: true,
-        displayOptions: { show: { resource: ['user'] } },
+        displayOptions: { show: { resource: ['liveUser'] } },
         options: [
           { name: 'Delete', value: 'delete', action: 'Remove a user' },
           { name: 'Delete Asset', value: 'deleteAsset', action: 'Delete a user asset' },
@@ -725,7 +644,7 @@ export class BambuserShows implements INodeType {
         name: 'operation',
         type: 'options',
         noDataExpression: true,
-        displayOptions: { show: { resource: ['stats'] } },
+        displayOptions: { show: { resource: ['liveStats'] } },
         options: [
           { name: 'Get Activity', value: 'getActivity', action: 'Get show activity in a time period' },
           { name: 'Get Activity Orders', value: 'getActivityOrders', action: 'Get orders by activity period' },
@@ -745,7 +664,7 @@ export class BambuserShows implements INodeType {
         name: 'operation',
         type: 'options',
         noDataExpression: true,
-        displayOptions: { show: { resource: ['webhook'] } },
+        displayOptions: { show: { resource: ['liveWebhook'] } },
         options: [
           { name: 'Create', value: 'create', action: 'Create a webhook subscription' },
           { name: 'Get Event', value: 'getEvent', action: 'Get a webhook event by ID' },
@@ -760,7 +679,7 @@ export class BambuserShows implements INodeType {
         type: 'string',
         required: true,
         default: '',
-        displayOptions: { show: { resource: ['broadcast'], operation: ['download', 'getTranscriptions'] } },
+        displayOptions: { show: { resource: ['liveBroadcast'], operation: ['download', 'getTranscriptions'] } },
       },
       {
         displayName: 'Format',
@@ -773,7 +692,7 @@ export class BambuserShows implements INodeType {
         ],
         default: 'MP4H264',
         description: 'Video format for the download link',
-        displayOptions: { show: { resource: ['broadcast'], operation: ['download'] } },
+        displayOptions: { show: { resource: ['liveBroadcast'], operation: ['download'] } },
       },
       {
         displayName: 'Cursor',
@@ -781,7 +700,7 @@ export class BambuserShows implements INodeType {
         type: 'string',
         default: '',
         description: 'Pagination cursor from the previous response',
-        displayOptions: { show: { resource: ['broadcast'], operation: ['getTranscriptions'] } },
+        displayOptions: { show: { resource: ['liveBroadcast'], operation: ['getTranscriptions'] } },
       },
 
       // ── showId ─────────────────────────────────────────────────────────────
@@ -793,7 +712,7 @@ export class BambuserShows implements INodeType {
         default: '',
         displayOptions: {
           show: {
-            resource: ['show'],
+            resource: ['liveShow'],
             operation: SHOW_ID_OPS,
           },
         },
@@ -806,7 +725,7 @@ export class BambuserShows implements INodeType {
         default: '',
         displayOptions: {
           show: {
-            resource: ['stats'],
+            resource: ['liveStats'],
             operation: STATS_SHOW_ID_OPS,
           },
         },
@@ -821,7 +740,7 @@ export class BambuserShows implements INodeType {
         default: '',
         displayOptions: {
           show: {
-            resource: ['product'],
+            resource: ['liveProduct'],
             operation: ['get', 'update', 'delete', 'getHighlightedShowsById'],
           },
         },
@@ -833,7 +752,7 @@ export class BambuserShows implements INodeType {
         required: true,
         default: '',
         displayOptions: {
-          show: { resource: ['show'], operation: ['removeProduct'] },
+          show: { resource: ['liveShow'], operation: ['removeProduct'] },
         },
       },
 
@@ -846,7 +765,7 @@ export class BambuserShows implements INodeType {
         default: '',
         displayOptions: {
           show: {
-            resource: ['channel'],
+            resource: ['liveChannel'],
             operation: ['get'],
           },
         },
@@ -858,7 +777,7 @@ export class BambuserShows implements INodeType {
         required: true,
         default: '',
         displayOptions: {
-          show: { resource: ['show'], operation: ['addChannel', 'removeChannel'] },
+          show: { resource: ['liveShow'], operation: ['addChannel', 'removeChannel'] },
         },
       },
 
@@ -870,7 +789,7 @@ export class BambuserShows implements INodeType {
         required: true,
         default: '',
         displayOptions: {
-          show: { resource: ['tag'], operation: ['get', 'update'] },
+          show: { resource: ['liveTag'], operation: ['get', 'update'] },
         },
       },
       {
@@ -880,7 +799,7 @@ export class BambuserShows implements INodeType {
         required: true,
         default: '',
         displayOptions: {
-          show: { resource: ['show'], operation: ['addTag', 'removeTag'] },
+          show: { resource: ['liveShow'], operation: ['addTag', 'removeTag'] },
         },
       },
 
@@ -892,7 +811,7 @@ export class BambuserShows implements INodeType {
         required: true,
         default: '',
         displayOptions: {
-          show: { resource: ['user'], operation: ['update', 'delete', 'getAssets', 'deleteAsset'] },
+          show: { resource: ['liveUser'], operation: ['update', 'delete', 'getAssets', 'deleteAsset'] },
         },
       },
       {
@@ -903,7 +822,7 @@ export class BambuserShows implements INodeType {
         default: '',
         description: 'Bambuser user ID of the message sender',
         displayOptions: {
-          show: { resource: ['show'], operation: ['sendChatMessage'] },
+          show: { resource: ['liveShow'], operation: ['sendChatMessage'] },
         },
       },
 
@@ -915,7 +834,7 @@ export class BambuserShows implements INodeType {
         required: true,
         default: '',
         displayOptions: {
-          show: { resource: ['show'], operation: ['updateChatMessage', 'createPinnedComment', 'updatePinnedComment'] },
+          show: { resource: ['liveShow'], operation: ['updateChatMessage', 'createPinnedComment', 'updatePinnedComment'] },
         },
       },
 
@@ -927,7 +846,7 @@ export class BambuserShows implements INodeType {
         required: true,
         default: '',
         displayOptions: {
-          show: { resource: ['show'], operation: ['updatePinnedComment', 'deletePinnedComment'] },
+          show: { resource: ['liveShow'], operation: ['updatePinnedComment', 'deletePinnedComment'] },
         },
       },
 
@@ -939,7 +858,7 @@ export class BambuserShows implements INodeType {
         required: true,
         default: '',
         displayOptions: {
-          show: { resource: ['show'], operation: ['updateHighlight', 'deleteHighlight'] },
+          show: { resource: ['liveShow'], operation: ['updateHighlight', 'deleteHighlight'] },
         },
       },
 
@@ -951,7 +870,7 @@ export class BambuserShows implements INodeType {
         required: true,
         default: '',
         displayOptions: {
-          show: { resource: ['show'], operation: ['deleteAsset'] },
+          show: { resource: ['liveShow'], operation: ['deleteAsset'] },
         },
       },
       {
@@ -961,7 +880,7 @@ export class BambuserShows implements INodeType {
         required: true,
         default: '',
         displayOptions: {
-          show: { resource: ['user'], operation: ['deleteAsset'] },
+          show: { resource: ['liveUser'], operation: ['deleteAsset'] },
         },
       },
 
@@ -972,7 +891,7 @@ export class BambuserShows implements INodeType {
         type: 'string',
         required: true,
         default: '',
-        displayOptions: { show: { resource: ['webhook'], operation: ['getEvent'] } },
+        displayOptions: { show: { resource: ['liveWebhook'], operation: ['getEvent'] } },
       },
 
       // ── title ──────────────────────────────────────────────────────────────
@@ -983,7 +902,7 @@ export class BambuserShows implements INodeType {
         required: true,
         default: '',
         displayOptions: {
-          show: { resource: ['show', 'channel'], operation: ['create'] },
+          show: { resource: ['liveShow', 'liveChannel'], operation: ['create'] },
         },
       },
 
@@ -995,7 +914,7 @@ export class BambuserShows implements INodeType {
         required: true,
         default: '',
         displayOptions: {
-          show: { resource: ['tag'], operation: ['create', 'update'] },
+          show: { resource: ['liveTag'], operation: ['create', 'update'] },
         },
       },
 
@@ -1009,7 +928,7 @@ export class BambuserShows implements INodeType {
         default: 50,
         displayOptions: {
           show: {
-            resource: ['show', 'product', 'tag', 'user', 'stats'],
+            resource: ['liveShow', 'liveProduct', 'liveTag', 'liveUser', 'liveStats'],
             operation: ['getMany', 'getChatMessages', 'getPinnedComments', 'getHighlights', 'getHighlighted', 'getShowOrders', 'getShowsOrders', 'getActivityOrders'],
           },
         },
@@ -1022,7 +941,7 @@ export class BambuserShows implements INodeType {
         description: 'Pagination cursor from the previous response "next" field',
         displayOptions: {
           show: {
-            resource: ['show', 'product', 'tag', 'user', 'stats'],
+            resource: ['liveShow', 'liveProduct', 'liveTag', 'liveUser', 'liveStats'],
             operation: ['getMany', 'getChatMessages', 'getPinnedComments', 'getHighlights', 'getHighlighted', 'getShowOrders', 'getShowsOrders', 'getActivityOrders'],
           },
         },
@@ -1038,7 +957,7 @@ export class BambuserShows implements INodeType {
         description: 'ISO date string — start of range',
         displayOptions: {
           show: {
-            resource: ['stats'],
+            resource: ['liveStats'],
             operation: ['getShows', 'getActivity', 'getShowsOrders', 'getActivityOrders', 'getShowsTraffic'],
           },
         },
@@ -1052,7 +971,7 @@ export class BambuserShows implements INodeType {
         description: 'ISO date string — end of range',
         displayOptions: {
           show: {
-            resource: ['stats'],
+            resource: ['liveStats'],
             operation: ['getShows', 'getActivity', 'getShowsOrders', 'getActivityOrders', 'getShowsTraffic'],
           },
         },
@@ -1071,7 +990,7 @@ export class BambuserShows implements INodeType {
           { name: 'Upcoming', value: 'upcoming' },
         ],
         default: '',
-        displayOptions: { show: { resource: ['show'], operation: ['getMany'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['getMany'] } },
       },
       {
         displayName: 'Contributor User ID',
@@ -1079,7 +998,7 @@ export class BambuserShows implements INodeType {
         type: 'string',
         default: '',
         description: 'Filter by contributor user ID',
-        displayOptions: { show: { resource: ['show'], operation: ['getMany'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['getMany'] } },
       },
       {
         displayName: 'Tag ID Filter',
@@ -1087,7 +1006,7 @@ export class BambuserShows implements INodeType {
         type: 'string',
         default: '',
         description: 'Filter shows by tag ID',
-        displayOptions: { show: { resource: ['show'], operation: ['getMany'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['getMany'] } },
       },
       {
         displayName: 'Is Published',
@@ -1099,7 +1018,7 @@ export class BambuserShows implements INodeType {
           { name: 'No', value: 'false' },
         ],
         default: '',
-        displayOptions: { show: { resource: ['show'], operation: ['getMany'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['getMany'] } },
       },
       {
         displayName: 'Is Test Show',
@@ -1111,7 +1030,7 @@ export class BambuserShows implements INodeType {
           { name: 'No', value: 'false' },
         ],
         default: '',
-        displayOptions: { show: { resource: ['show'], operation: ['getMany'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['getMany'] } },
       },
 
       // ── show:create optional fields ────────────────────────────────────────
@@ -1121,7 +1040,7 @@ export class BambuserShows implements INodeType {
         type: 'fixedCollection',
         typeOptions: { multipleValues: false },
         default: {},
-        displayOptions: { show: { resource: ['show'], operation: ['create'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['create'] } },
         options: [
           {
             displayName: 'Values',
@@ -1190,7 +1109,7 @@ export class BambuserShows implements INodeType {
         type: 'fixedCollection',
         typeOptions: { multipleValues: false },
         default: {},
-        displayOptions: { show: { resource: ['show'], operation: ['update'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['update'] } },
         options: [
           {
             displayName: 'Values',
@@ -1267,7 +1186,7 @@ export class BambuserShows implements INodeType {
         type: 'fixedCollection',
         typeOptions: { multipleValues: false },
         default: {},
-        displayOptions: { show: { resource: ['product'], operation: ['update'] } },
+        displayOptions: { show: { resource: ['liveProduct'], operation: ['update'] } },
         options: [
           {
             displayName: 'Values',
@@ -1289,7 +1208,7 @@ export class BambuserShows implements INodeType {
         type: 'fixedCollection',
         typeOptions: { multipleValues: false },
         default: {},
-        displayOptions: { show: { resource: ['user'], operation: ['update'] } },
+        displayOptions: { show: { resource: ['liveUser'], operation: ['update'] } },
         options: [
           {
             displayName: 'Values',
@@ -1311,7 +1230,7 @@ export class BambuserShows implements INodeType {
         type: 'string',
         required: true,
         default: '',
-        displayOptions: { show: { resource: ['show'], operation: ['sendChatMessage'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['sendChatMessage'] } },
       },
       {
         displayName: 'Status',
@@ -1322,7 +1241,7 @@ export class BambuserShows implements INodeType {
           { name: 'Unpublished', value: 'unpublished' },
         ],
         default: 'published',
-        displayOptions: { show: { resource: ['show'], operation: ['sendChatMessage'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['sendChatMessage'] } },
       },
       {
         displayName: 'Reply To Message ID',
@@ -1330,7 +1249,7 @@ export class BambuserShows implements INodeType {
         type: 'string',
         default: '',
         description: 'Optional — ID of the message to reply to',
-        displayOptions: { show: { resource: ['show'], operation: ['sendChatMessage'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['sendChatMessage'] } },
       },
 
       // ── show:updateChatMessage ─────────────────────────────────────────────
@@ -1343,7 +1262,7 @@ export class BambuserShows implements INodeType {
           { name: 'Unpublished', value: 'unpublished' },
         ],
         default: 'unpublished',
-        displayOptions: { show: { resource: ['show'], operation: ['updateChatMessage'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['updateChatMessage'] } },
       },
 
       // ── getPinnedComments / getHighlights filter ───────────────────────────
@@ -1356,7 +1275,7 @@ export class BambuserShows implements INodeType {
           { name: 'Latest', value: 'latest' },
         ],
         default: '',
-        displayOptions: { show: { resource: ['show'], operation: ['getPinnedComments', 'getHighlights'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['getPinnedComments', 'getHighlights'] } },
       },
 
       // ── show:addHighlight / updateHighlight ────────────────────────────────
@@ -1367,7 +1286,7 @@ export class BambuserShows implements INodeType {
         default: '',
         placeholder: 'tpl:abc123, tpl:def456',
         description: 'Comma-separated list of product IDs to highlight',
-        displayOptions: { show: { resource: ['show'], operation: ['addHighlight', 'updateHighlight'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['addHighlight', 'updateHighlight'] } },
       },
       {
         displayName: 'Start Relative (Seconds)',
@@ -1375,7 +1294,7 @@ export class BambuserShows implements INodeType {
         type: 'number',
         default: '',
         description: 'Position in archived show (seconds from start). Leave empty for live shows.',
-        displayOptions: { show: { resource: ['show'], operation: ['addHighlight'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['addHighlight'] } },
       },
 
       // ── show:addProduct ────────────────────────────────────────────────────
@@ -1385,7 +1304,7 @@ export class BambuserShows implements INodeType {
         type: 'string',
         required: true,
         default: '',
-        displayOptions: { show: { resource: ['show'], operation: ['addProduct'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['addProduct'] } },
       },
 
       // ── show:addProductsBatch ──────────────────────────────────────────────
@@ -1398,7 +1317,7 @@ export class BambuserShows implements INodeType {
         placeholder: '[{"publicUrl":"https://example.com/product"}]',
         description: 'JSON array of product objects — each requires at least publicUrl',
         typeOptions: { rows: 4 },
-        displayOptions: { show: { resource: ['show'], operation: ['addProductsBatch'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['addProductsBatch'] } },
       },
 
       // ── show:reorderProducts ───────────────────────────────────────────────
@@ -1410,7 +1329,7 @@ export class BambuserShows implements INodeType {
         default: '',
         placeholder: 'tpl:abc123, tpl:def456',
         description: 'Comma-separated product IDs in desired order',
-        displayOptions: { show: { resource: ['show'], operation: ['reorderProducts'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['reorderProducts'] } },
       },
 
       // ── show:updateChannels ────────────────────────────────────────────────
@@ -1422,7 +1341,7 @@ export class BambuserShows implements INodeType {
         default: '',
         placeholder: 'id1, id2',
         description: 'Comma-separated channel IDs — replaces all current channels',
-        displayOptions: { show: { resource: ['show'], operation: ['updateChannels'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['updateChannels'] } },
       },
 
       // ── show:updateTags ────────────────────────────────────────────────────
@@ -1434,7 +1353,7 @@ export class BambuserShows implements INodeType {
         default: '',
         placeholder: 'id1, id2',
         description: 'Comma-separated tag IDs — replaces all current tags',
-        displayOptions: { show: { resource: ['show'], operation: ['updateTags'] } },
+        displayOptions: { show: { resource: ['liveShow'], operation: ['updateTags'] } },
       },
 
       // ── product:getHighlightedShows ────────────────────────────────────────
@@ -1445,7 +1364,7 @@ export class BambuserShows implements INodeType {
         required: true,
         default: '',
         description: 'SKU or product reference string',
-        displayOptions: { show: { resource: ['product'], operation: ['getHighlightedShows'] } },
+        displayOptions: { show: { resource: ['liveProduct'], operation: ['getHighlightedShows'] } },
       },
       {
         displayName: 'Product References',
@@ -1455,7 +1374,7 @@ export class BambuserShows implements INodeType {
         default: '',
         placeholder: 'sku1, sku2, sku3',
         description: 'Comma-separated product references (max 20)',
-        displayOptions: { show: { resource: ['product'], operation: ['getHighlightedShowsByRefs'] } },
+        displayOptions: { show: { resource: ['liveProduct'], operation: ['getHighlightedShowsByRefs'] } },
       },
       {
         displayName: 'Show ID Filter',
@@ -1463,7 +1382,7 @@ export class BambuserShows implements INodeType {
         type: 'string',
         default: '',
         description: 'Optional — filter highlighted products by show ID',
-        displayOptions: { show: { resource: ['product'], operation: ['getHighlighted'] } },
+        displayOptions: { show: { resource: ['liveProduct'], operation: ['getHighlighted'] } },
       },
 
       // ── user:getMany filters ───────────────────────────────────────────────
@@ -1473,7 +1392,7 @@ export class BambuserShows implements INodeType {
         type: 'string',
         default: '',
         description: 'Filter by exact user ID',
-        displayOptions: { show: { resource: ['user'], operation: ['getMany'] } },
+        displayOptions: { show: { resource: ['liveUser'], operation: ['getMany'] } },
       },
       {
         displayName: 'Email',
@@ -1481,14 +1400,14 @@ export class BambuserShows implements INodeType {
         type: 'string',
 								placeholder: 'name@email.com',
         default: '',
-        displayOptions: { show: { resource: ['user'], operation: ['getMany'] } },
+        displayOptions: { show: { resource: ['liveUser'], operation: ['getMany'] } },
       },
       {
         displayName: 'External Reference ID',
         name: 'externalReferenceId',
         type: 'string',
         default: '',
-        displayOptions: { show: { resource: ['user'], operation: ['getMany'] } },
+        displayOptions: { show: { resource: ['liveUser'], operation: ['getMany'] } },
       },
 
       // ── user:invite ────────────────────────────────────────────────────────
@@ -1499,7 +1418,7 @@ export class BambuserShows implements INodeType {
 								placeholder: 'name@email.com',
         required: true,
         default: '',
-        displayOptions: { show: { resource: ['user'], operation: ['invite'] } },
+        displayOptions: { show: { resource: ['liveUser'], operation: ['invite'] } },
       },
       {
         displayName: 'Display Name',
@@ -1507,7 +1426,7 @@ export class BambuserShows implements INodeType {
         type: 'string',
         required: true,
         default: '',
-        displayOptions: { show: { resource: ['user'], operation: ['invite'] } },
+        displayOptions: { show: { resource: ['liveUser'], operation: ['invite'] } },
       },
       {
         displayName: 'Roles',
@@ -1517,28 +1436,28 @@ export class BambuserShows implements INodeType {
         default: 'host',
         placeholder: 'admin, showCreator, host',
         description: 'Comma-separated roles',
-        displayOptions: { show: { resource: ['user'], operation: ['invite'] } },
+        displayOptions: { show: { resource: ['liveUser'], operation: ['invite'] } },
       },
       {
         displayName: 'Full Name',
         name: 'fullName',
         type: 'string',
         default: '',
-        displayOptions: { show: { resource: ['user'], operation: ['invite'] } },
+        displayOptions: { show: { resource: ['liveUser'], operation: ['invite'] } },
       },
       {
         displayName: 'External Reference ID',
         name: 'externalReferenceId',
         type: 'string',
         default: '',
-        displayOptions: { show: { resource: ['user'], operation: ['invite'] } },
+        displayOptions: { show: { resource: ['liveUser'], operation: ['invite'] } },
       },
       {
         displayName: 'Omit Welcome Email',
         name: 'omitWelcomeEmail',
         type: 'boolean',
         default: false,
-        displayOptions: { show: { resource: ['user'], operation: ['invite'] } },
+        displayOptions: { show: { resource: ['liveUser'], operation: ['invite'] } },
       },
 
       // ── webhook:create ─────────────────────────────────────────────────────
@@ -1548,7 +1467,7 @@ export class BambuserShows implements INodeType {
         type: 'string',
         required: true,
         default: '',
-        displayOptions: { show: { resource: ['webhook'], operation: ['create'] } },
+        displayOptions: { show: { resource: ['liveWebhook'], operation: ['create'] } },
       },
       {
         displayName: 'URL',
@@ -1557,54 +1476,16 @@ export class BambuserShows implements INodeType {
         required: true,
         default: '',
         description: 'HTTPS callback URL for webhook delivery',
-        displayOptions: { show: { resource: ['webhook'], operation: ['create'] } },
+        displayOptions: { show: { resource: ['liveWebhook'], operation: ['create'] } },
       },
       {
         displayName: 'Topics',
         name: 'webhookTopics',
         type: 'string',
         required: true,
-        default: 'show',
+        default: 'liveShow',
         placeholder: 'show, product, user, product-highlight, broadcast',
         description: 'Comma-separated list of topics to subscribe to',
-        displayOptions: { show: { resource: ['webhook'], operation: ['create'] } },
+        displayOptions: { show: { resource: ['liveWebhook'], operation: ['create'] } },
       },
-    ],
-		usableAsTool: true,
-  };
-
-  async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
-    const items = this.getInputData();
-    const credentials = await this.getCredentials('bambuserApi');
-    const origin = resolveOrigin(credentials.baseUrl as string, credentials.region as string);
-    const handlers = buildOperationHandlers(this, `${origin}/v1`);
-
-    const results = await Promise.all(
-      items.map(async (_, i) => {
-        const resource = this.getNodeParameter('resource', i) as string;
-        const operation = this.getNodeParameter('operation', i) as string;
-        const key = `${resource}:${operation}` as OperationKey;
-        const handler = handlers[key];
-
-        if (!handler) {
-          throw new NodeOperationError(
-            this.getNode(),
-            `Unknown operation "${operation}" for resource "${resource}"`,
-            { itemIndex: i },
-          );
-        }
-
-        const requestOptions = await handler(i);
-        const responseData = await this.helpers.httpRequestWithAuthentication.call(
-          this,
-          'bambuserApi',
-          requestOptions,
-        ) ?? { success: true };
-
-        return { json: responseData as IDataObject };
-      }),
-    );
-
-    return [results];
-  }
-}
+];

@@ -28,7 +28,7 @@
     },
     {
       "parameters": {
-        "resource": "product",
+        "resource": "catalogProduct",
         "operation": "search",
         "q": "",
         "limit": 1000,
@@ -36,7 +36,7 @@
       },
       "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567802",
       "name": "Get Products",
-      "type": "CUSTOM.bambuserProductCatalog",
+      "type": "CUSTOM.bambuser",
       "typeVersion": 1,
       "position": [
         500,
@@ -51,14 +51,14 @@
     },
     {
       "parameters": {
-        "resource": "product",
+        "resource": "catalogProduct",
         "operation": "count",
         "q": "",
         "locale": "en"
       },
       "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567803",
       "name": "Get Product Count",
-      "type": "CUSTOM.bambuserProductCatalog",
+      "type": "CUSTOM.bambuser",
       "typeVersion": 1,
       "position": [
         500,

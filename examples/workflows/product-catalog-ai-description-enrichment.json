@@ -25,7 +25,7 @@
     },
     {
       "parameters": {
-        "resource": "product",
+        "resource": "catalogProduct",
         "operation": "product:search",
         "q": "",
         "limit": 50,
@@ -34,7 +34,7 @@
       },
       "id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
       "name": "Search Products",
-      "type": "CUSTOM.bambuserProductCatalog",
+      "type": "CUSTOM.bambuser",
       "typeVersion": 1,
       "position": [
         500,
@@ -112,14 +112,14 @@
     },
     {
       "parameters": {
-        "resource": "product",
+        "resource": "catalogProduct",
         "operation": "product:update",
         "productId": "={{ $('Loop Over Products').item.json.id }}",
         "productBody": "={{ JSON.stringify({ description: $json.text }) }}"
       },
       "id": "a7b8c9d0-e1f2-4a3b-4c5d-6e7f8a9b0c1d",
       "name": "Update Product Description",
-      "type": "CUSTOM.bambuserProductCatalog",
+      "type": "CUSTOM.bambuser",
       "typeVersion": 1,
       "position": [
         1500,

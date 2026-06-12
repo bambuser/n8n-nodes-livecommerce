@@ -6,7 +6,7 @@
 [![Node 24+](https://img.shields.io/node/v/@bambuser/n8n-nodes-livecommerce.svg)](https://nodejs.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-Community [n8n](https://n8n.io) nodes for the [Bambuser](https://bambuser.com) video-commerce platform. Connect **Bambuser Live**, **Bambuser Shoppable Videos**, **Bambuser Video Consultation**, the product catalog, shopper-data records, and webhook events into n8n's 400+ integrations without writing custom HTTP code.
+Community [n8n](https://n8n.io) nodes for the [Bambuser](https://bambuser.com) video-commerce platform. A single **Bambuser** action node covers live shopping, shoppable videos, video consultation, product catalog, and shopper data; a companion **Bambuser Webhook Trigger** delivers events into n8n's 400+ integrations without writing custom HTTP code.
 
 ## About
 
@@ -14,35 +14,24 @@ Bambuser powers live, on-demand, and one-to-one video commerce for retailers and
 
 ## Available nodes
 
-All nodes share a single `Bambuser API` credential. Each maps to a Bambuser product area and exposes resource/operation pairs in the standard n8n style.
+Two nodes ship in the package, sharing a single `Bambuser API` credential.
 
-**Bambuser Webhook Trigger** — Start a workflow when Bambuser fires an event. The node registers and tears down the subscription against the Bambuser API on workflow activation/deactivation, and re-registers automatically if the webhook URL changes.
+### Bambuser (action node)
+
+A single action node covering every read/write surface of the Bambuser public APIs. The top-level **Resource** dropdown groups operations by service area:
+
+- **Live Show, Live Product, Live Channel, Live Tag, Live User, Live Statistic, Live Webhook, Live Broadcast** — Live Shopping API. List, create, update, publish, and schedule shows; pin chat messages; manage product highlights; pull viewer/sales metrics.
+- **Video, Media Asset, Video Playlist** — Shoppable Videos (VOD). Clip broadcasts into VODs, manage media assets and captions, query the video library. Requires the `VOD_MANAGE` scope.
+- **Call, Connect Link, Call Statistic** — Video Consultation. Create connect links, fetch call transcripts, pull call statistics.
+- **Catalog Product** — Product Catalog. Search, count, create, update, and delete products. Suitable for AI enrichment and stock-sync workflows. Requires `PRODUCT_CATALOG_READ` or `PRODUCT_CATALOG_MANAGE`.
+- **Shopper Data** — GDPR-relevant shopper records. List, get, and erase records. Requires `READ_SHOPPER_DATA`.
+
+### Bambuser Webhook Trigger
+
+Start a workflow when Bambuser fires an event. The node registers and tears down the subscription against the Bambuser API on workflow activation/deactivation, and re-registers automatically if the webhook URL changes.
+
 - `show.*`, `broadcast.*`, `product.*`, `product-highlight.*`, `user.*` topics
 - Requires the `WRITE_WEBHOOKS` API-key scope
-
-**Bambuser Live** — Read and write live show data mid-workflow.
-- List, create, update, publish, and schedule shows
-- Pin and unpin chat messages
-- Manage product highlights and pull viewer/sales metrics
-
-**Bambuser Shoppable Videos** — Create and manage VOD assets.
-- Clip a broadcast into a VOD
-- Manage media assets, captions, and video playlists
-- Query the video library
-
-**Bambuser Product Catalog** — Search and manage the product catalog.
-- Search and count products
-- Create, update, delete
-- Suitable for AI enrichment and stock-sync workflows
-
-**Bambuser Video Consultation** — Automate one-to-one video calls and connect links.
-- Create connect links
-- Fetch call transcripts
-- Manage agents, appointments, and availability
-
-**Bambuser Shopper Data** — Read and erase shopper-data records.
-- List and get records
-- Drive GDPR erasure pipelines from a webhook
 
 ### Credential
 
