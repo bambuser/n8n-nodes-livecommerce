@@ -32,7 +32,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const d = $input.first().json;\nif (d.type !== 'show.ended') return [];\nreturn [{ json: { showId: d.showId, showTitle: d.showTitle } }];\n"
+        "jsCode": "const event = $input.first().json;\nif (event.collection !== 'show' || event.action !== 'update' || event.payload?.state !== 'ended' || !event.payload?.endedAt) return [];\nreturn [{ json: { showId: event.payload.id, showTitle: event.payload.title || event.payload.id } }];\n"
       },
       "id": "9fe463a2-b470-41fa-b707-a0ebc134d201",
       "name": "Filter Show Ended",
