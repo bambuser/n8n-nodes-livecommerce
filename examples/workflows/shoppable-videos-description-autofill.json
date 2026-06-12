@@ -26,7 +26,7 @@
     {
       "parameters": {
         "resource": "video",
-        "operation": "list",
+        "operation": "getMany",
         "limit": 50
       },
       "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
@@ -48,7 +48,7 @@
       "parameters": {
         "language": "javaScript",
         "mode": "runOnceForAllItems",
-        "jsCode": "return $input.all().filter(item => {\n  const desc = item.json.description;\n  return desc === undefined || desc === null || desc === '' || (typeof desc === 'string' && desc.trim() === '');\n});"
+        "jsCode": "const videos = $input.first().json.data || [];\nreturn videos\n  .filter(v => v.description === undefined || v.description === null || (typeof v.description === 'string' && v.description.trim() === ''))\n  .map(v => ({ json: v }));\n"
       },
       "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
       "name": "Filter Missing Descriptions",
@@ -114,8 +114,10 @@
       "parameters": {
         "resource": "video",
         "operation": "update",
-        "videoId": "={{ $('Process One at a Time').item.json.id }}",
-        "videoBody": "={{ JSON.stringify({ description: $json.text }) }}"
+        "videoId": "={{ $(\"Process One at a Time\").item.json.id }}",
+        "title": "={{ $(\"Process One at a Time\").item.json.title }}",
+        "description": "={{ $json.text }}",
+        "locale": ""
       },
       "id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
       "name": "Update Video Description",
@@ -169,6 +171,7 @@
     },
     "Process One at a Time": {
       "main": [
+        [],
         [
           {
             "node": "Generate Description with Gemini",
