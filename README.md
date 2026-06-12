@@ -1,6 +1,6 @@
 # n8n-nodes-livecommerce
 
-[![CI](https://github.com/bambuser/n8n-nodes-livecommerce/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/bambuser/n8n-nodes-livecommerce/actions/workflows/ci.yml)
+[![CI](https://github.com/bambuser/n8n-nodes-livecommerce/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bambuser/n8n-nodes-livecommerce/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/@bambuser/n8n-nodes-livecommerce.svg)](https://www.npmjs.com/package/@bambuser/n8n-nodes-livecommerce)
 [![npm downloads](https://img.shields.io/npm/dm/@bambuser/n8n-nodes-livecommerce.svg)](https://www.npmjs.com/package/@bambuser/n8n-nodes-livecommerce)
 [![Node 24+](https://img.shields.io/node/v/@bambuser/n8n-nodes-livecommerce.svg)](https://nodejs.org)
