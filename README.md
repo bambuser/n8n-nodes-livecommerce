@@ -35,7 +35,15 @@ Start a workflow when Bambuser fires an event. The node registers and tears down
 
 ### Credential
 
-The `Bambuser API` credential takes an API key, a region (`EU` or `US`), and an optional base-URL override. The key is sent as `Authorization: Token <key>`. Scopes are granted per-key in the Bambuser dashboard; relevant scopes include `VOD_MANAGE`, `VOD_READ`, `PRODUCT_CATALOG_READ`, `PRODUCT_CATALOG_MANAGE`, `WRITE_WEBHOOKS`, and `READ_SHOPPER_DATA`. Grant only the scopes the workflow needs.
+The `Bambuser API` credential takes an API key, a region (`EU` or `US`), and an optional base-URL override. The key is sent as `Authorization: Token <key>`. Scopes are granted per-key in the Bambuser dashboard; per service area the relevant ones are:
+
+- **Live Shopping** — `READ_SHOWS`, `WRITE_SHOWS`, `DELETE_SHOWS`, `READ_PRODUCTS`, `WRITE_PRODUCTS`, `DELETE_PRODUCTS`, `READ_USERS`, `WRITE_USERS`, `DELETE_USERS`, `READ_TAGS`, `WRITE_TAGS`, `READ_CHANNELS`, `READ_STATS`, `READ_BROADCASTS`, `READ_WEBHOOKS`, `WRITE_WEBHOOKS`
+- **Shoppable Videos** — `VOD_READ`, `VOD_MANAGE`
+- **Video Consultation** — `READ_CALLS`, `READ_CALLS_STATS`, `READ_CONNECT_LINKS`, `WRITE_CONNECT_LINKS`, `DELETE_CONNECT_LINKS`
+- **Product Catalog** — `PRODUCT_CATALOG_READ`, `PRODUCT_CATALOG_MANAGE`
+- **Shopper Data** — `READ_SHOPPER_DATA`
+
+Grant only the scopes the workflow needs.
 
 ## Prerequisites
 
