@@ -98,7 +98,8 @@ describe('BambuserWebhookTrigger', () => {
     });
 
     await node.webhookMethods.default.delete.call(ctx);
-    assert.equal(staticData.webhookId, undefined);
+    assert.equal(staticData.webhookId, undefined, 'should clear webhookId');
+    assert.equal(staticData.webhookUrl, undefined, 'should also clear webhookUrl');
     assert.equal(server.requests[0]!.path, '/v1/webhooks/wh_1');
   });
 });

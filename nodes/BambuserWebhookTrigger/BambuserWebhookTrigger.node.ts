@@ -107,12 +107,14 @@ export class BambuserWebhookTrigger implements INodeType {
         const credentials = await this.getCredentials('bambuserApi');
         const origin = resolveOrigin(credentials.baseUrl as string, credentials.region as string);
 
+        // Best-effort: ignore error if the remote subscription was already deleted
         await this.helpers.httpRequestWithAuthentication.call(this, 'bambuserApi', {
           method: 'DELETE',
           url: `${origin}/v1/webhooks/${staticData.webhookId}`,
         }).catch(() => {});
 
         delete staticData.webhookId;
+        delete staticData.webhookUrl;
         return true;
       },
     },
