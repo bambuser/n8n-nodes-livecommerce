@@ -11,13 +11,7 @@
         250,
         300
       ],
-      "onError": "continueRegularOutput",
-      "credentials": {
-        "bambuserApi": {
-          "id": "v775jz3jBLJcNwlW",
-          "name": "Bambuser account"
-        }
-      }
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -34,13 +28,7 @@
         500,
         300
       ],
-      "onError": "continueRegularOutput",
-      "credentials": {
-        "bambuserApi": {
-          "id": "v775jz3jBLJcNwlW",
-          "name": "Bambuser account"
-        }
-      }
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -141,13 +129,7 @@
         1250,
         300
       ],
-      "onError": "stopWorkflow",
-      "credentials": {
-        "googleDocsOAuth2Api": {
-          "id": "awV7X3KCEUsQRvJs",
-          "name": "Google Docs account"
-        }
-      }
+      "onError": "stopWorkflow"
     }
   ],
   "connections": {

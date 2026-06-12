@@ -36,19 +36,13 @@
       "position": [
         500,
         300
-      ],
-      "credentials": {
-        "bambuserApi": {
-          "id": "v775jz3jBLJcNwlW",
-          "name": "Bambuser account"
-        }
-      }
+      ]
     },
     {
       "parameters": {
         "language": "javaScript",
         "mode": "runOnceForAllItems",
-        "jsCode": "const videos = $input.first().json.data || [];\nreturn videos\n  .filter(v => v.description === undefined || v.description === null || (typeof v.description === 'string' && v.description.trim() === ''))\n  .map(v => ({ json: v }));\n"
+        "jsCode": "const videos = $input.first().json.data || [];\nreturn videos\n  .filter(v => v.description === undefined || v.description === null || (typeof v.description === 'string' && v.description.trim() === ''))\n  .map(v => ({ json: v }));"
       },
       "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
       "name": "Filter Missing Descriptions",
@@ -102,19 +96,13 @@
       "position": [
         1250,
         300
-      ],
-      "credentials": {
-        "googlePalmApi": {
-          "id": "zWjTkBrecPDssM2x",
-          "name": "Google Gemini(PaLM) Api account"
-        }
-      }
+      ]
     },
     {
       "parameters": {
         "resource": "video",
         "operation": "update",
-        "videoId": "={{ $(\"Process One at a Time\").item.json.id }}",
+        "videoId": "={{ $('Process One at a Time').item.json.id }}",
         "title": "={{ $(\"Process One at a Time\").item.json.title }}",
         "description": "={{ $json.text }}",
         "locale": ""
@@ -126,13 +114,7 @@
       "position": [
         1500,
         300
-      ],
-      "credentials": {
-        "bambuserApi": {
-          "id": "v775jz3jBLJcNwlW",
-          "name": "Bambuser account"
-        }
-      }
+      ]
     }
   ],
   "connections": {

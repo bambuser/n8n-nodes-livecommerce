@@ -41,13 +41,7 @@
       "position": [
         500,
         150
-      ],
-      "credentials": {
-        "bambuserApi": {
-          "id": "v775jz3jBLJcNwlW",
-          "name": "Bambuser account"
-        }
-      }
+      ]
     },
     {
       "parameters": {
@@ -63,13 +57,7 @@
       "position": [
         500,
         450
-      ],
-      "credentials": {
-        "bambuserApi": {
-          "id": "v775jz3jBLJcNwlW",
-          "name": "Bambuser account"
-        }
-      }
+      ]
     },
     {
       "parameters": {
@@ -112,13 +100,7 @@
       "position": [
         1000,
         500
-      ],
-      "credentials": {
-        "googlePalmApi": {
-          "id": "zWjTkBrecPDssM2x",
-          "name": "Google Gemini(PaLM) Api account"
-        }
-      }
+      ]
     },
     {
       "parameters": {
@@ -145,13 +127,7 @@
         1250,
         300
       ],
-      "onError": "continueRegularOutput",
-      "credentials": {
-        "googleDocsOAuth2Api": {
-          "id": "awV7X3KCEUsQRvJs",
-          "name": "Google Docs account"
-        }
-      }
+      "onError": "continueRegularOutput"
     }
   ],
   "connections": {

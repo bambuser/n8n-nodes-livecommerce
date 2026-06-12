@@ -21,13 +21,7 @@
         0
       ],
       "webhookId": "b1648fff-d7d0-4841-990c-8202d9029509",
-      "typeVersion": 1,
-      "credentials": {
-        "bambuserApi": {
-          "id": "v775jz3jBLJcNwlW",
-          "name": "Bambuser account"
-        }
-      }
+      "typeVersion": 1
     },
     {
       "parameters": {
@@ -45,13 +39,7 @@
         992,
         0
       ],
-      "typeVersion": 1,
-      "credentials": {
-        "bambuserApi": {
-          "id": "v775jz3jBLJcNwlW",
-          "name": "Bambuser account"
-        }
-      }
+      "typeVersion": 1
     },
     {
       "parameters": {
@@ -79,13 +67,7 @@
         0
       ],
       "id": "0f417cd6-77bb-4616-a4a1-9552bc8aaa29",
-      "name": "Get Show Broadcasts",
-      "credentials": {
-        "bambuserApi": {
-          "id": "v775jz3jBLJcNwlW",
-          "name": "Bambuser account"
-        }
-      }
+      "name": "Get Show Broadcasts"
     },
     {
       "parameters": {

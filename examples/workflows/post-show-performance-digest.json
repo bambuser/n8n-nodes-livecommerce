@@ -22,13 +22,7 @@
         112,
         304
       ],
-      "webhookId": "fe476527-15e5-4c15-bf98-b40b72cc1c8e",
-      "credentials": {
-        "bambuserApi": {
-          "id": "v775jz3jBLJcNwlW",
-          "name": "Bambuser account"
-        }
-      }
+      "webhookId": "fe476527-15e5-4c15-bf98-b40b72cc1c8e"
     },
     {
       "parameters": {
@@ -56,13 +50,7 @@
       "position": [
         560,
         304
-      ],
-      "credentials": {
-        "bambuserApi": {
-          "id": "v775jz3jBLJcNwlW",
-          "name": "Bambuser account"
-        }
-      }
+      ]
     },
     {
       "parameters": {
@@ -76,13 +64,7 @@
       "position": [
         784,
         304
-      ],
-      "credentials": {
-        "bambuserApi": {
-          "id": "v775jz3jBLJcNwlW",
-          "name": "Bambuser account"
-        }
-      }
+      ]
     },
     {
       "parameters": {
@@ -124,13 +106,7 @@
       "position": [
         1304,
         528
-      ],
-      "credentials": {
-        "googlePalmApi": {
-          "id": "zWjTkBrecPDssM2x",
-          "name": "Google Gemini(PaLM) Api account"
-        }
-      }
+      ]
     },
     {
       "parameters": {

@@ -30,13 +30,7 @@
       "position": [
         336,
         304
-      ],
-      "credentials": {
-        "bambuserApi": {
-          "id": "v775jz3jBLJcNwlW",
-          "name": "Bambuser account"
-        }
-      }
+      ]
     },
     {
       "parameters": {
@@ -78,13 +72,7 @@
       "position": [
         856,
         528
-      ],
-      "credentials": {
-        "googlePalmApi": {
-          "id": "zWjTkBrecPDssM2x",
-          "name": "Google Gemini(PaLM) Api account"
-        }
-      }
+      ]
     },
     {
       "parameters": {
@@ -114,13 +102,7 @@
       "position": [
         1360,
         304
-      ],
-      "credentials": {
-        "bambuserApi": {
-          "id": "v775jz3jBLJcNwlW",
-          "name": "Bambuser account"
-        }
-      }
+      ]
     }
   ],
   "connections": {

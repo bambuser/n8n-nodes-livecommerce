@@ -54,13 +54,7 @@
       "position": [
         560,
         304
-      ],
-      "credentials": {
-        "bambuserApi": {
-          "id": "v775jz3jBLJcNwlW",
-          "name": "Bambuser account"
-        }
-      }
+      ]
     },
     {
       "parameters": {
@@ -74,13 +68,7 @@
       "position": [
         784,
         304
-      ],
-      "credentials": {
-        "bambuserApi": {
-          "id": "v775jz3jBLJcNwlW",
-          "name": "Bambuser account"
-        }
-      }
+      ]
     },
     {
       "parameters": {
@@ -122,13 +110,7 @@
       "position": [
         1304,
         528
-      ],
-      "credentials": {
-        "googlePalmApi": {
-          "id": "zWjTkBrecPDssM2x",
-          "name": "Google Gemini(PaLM) Api account"
-        }
-      }
+      ]
     },
     {
       "parameters": {
@@ -152,12 +134,6 @@
         1808,
         304
       ],
-      "credentials": {
-        "googleDocsOAuth2Api": {
-          "id": "awV7X3KCEUsQRvJs",
-          "name": "Google Docs account"
-        }
-      },
       "parameters": {
         "resource": "document",
         "operation": "create",
@@ -175,12 +151,6 @@
         2032,
         304
       ],
-      "credentials": {
-        "googleDocsOAuth2Api": {
-          "id": "awV7X3KCEUsQRvJs",
-          "name": "Google Docs account"
-        }
-      },
       "parameters": {
         "resource": "document",
         "operation": "update",

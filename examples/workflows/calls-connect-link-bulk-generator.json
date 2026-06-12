@@ -27,13 +27,7 @@
       "position": [
         500,
         300
-      ],
-      "credentials": {
-        "googleDocsOAuth2Api": {
-          "id": "awV7X3KCEUsQRvJs",
-          "name": "Google Docs account"
-        }
-      }
+      ]
     },
     {
       "parameters": {
@@ -78,13 +72,7 @@
       "position": [
         1250,
         300
-      ],
-      "credentials": {
-        "bambuserApi": {
-          "id": "v775jz3jBLJcNwlW",
-          "name": "Bambuser account"
-        }
-      }
+      ]
     },
     {
       "parameters": {
@@ -127,13 +115,7 @@
       "position": [
         1750,
         300
-      ],
-      "credentials": {
-        "googleDocsOAuth2Api": {
-          "id": "awV7X3KCEUsQRvJs",
-          "name": "Google Docs account"
-        }
-      }
+      ]
     }
   ],
   "connections": {
