@@ -21,7 +21,7 @@ Two nodes ship in the package, sharing a single `Bambuser API` credential.
 A single action node covering every read/write surface of the Bambuser public APIs. The top-level **Resource** dropdown groups operations by service area:
 
 - **Live Show, Live Product, Live Channel, Live Tag, Live User, Live Statistic, Live Webhook, Live Broadcast** — Live Shopping API. List, create, update, publish, and schedule shows; pin chat messages; manage product highlights; pull viewer/sales metrics.
-- **Video, Media Asset, Video Playlist** — Shoppable Videos (VOD). Clip broadcasts into VODs, manage media assets and captions, query the video library. Requires the `VOD_MANAGE` scope.
+- **Video, Media Asset, Video Playlist** — Shoppable Videos (VOD). Clip broadcasts into VODs, manage media assets and captions, query the video library. Requires `VOD_READ` for read operations, `VOD_MANAGE` for writes.
 - **Call, Connect Link, Call Statistic** — Video Consultation. Create connect links, fetch call transcripts, pull call statistics.
 - **Catalog Product** — Product Catalog. Search, count, create, update, and delete products. Suitable for AI enrichment and stock-sync workflows. Requires `PRODUCT_CATALOG_READ` or `PRODUCT_CATALOG_MANAGE`.
 - **Shopper Data** — GDPR-relevant shopper records. List, get, and erase records. Requires `READ_SHOPPER_DATA`.
