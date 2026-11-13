@@ -8,7 +8,7 @@ import type {
   INodeType,
   INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeOperationError } from 'n8n-workflow';
+import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 import { resolveOrigin } from '../../lib/resolveOrigin';
 import type { HandlerMap } from './shared/types';
 import * as live from './resources/live';
@@ -40,14 +40,14 @@ export class Bambuser implements INodeType {
   description: INodeTypeDescription = {
     displayName: 'Bambuser',
     name: 'bambuser',
-    icon: 'file:bambuser.svg',
+    icon: { light: 'file:bambuser.svg', dark: 'file:bambuser.svg' },
     group: ['transform'],
     version: 1,
     subtitle: '={{$parameter["resource"] + ": " + $parameter["operation"]}}',
     description: 'Interact with the Bambuser Live Commerce API: live shopping, on-demand video, video calls, product catalog, and shopper data',
     defaults: { name: 'Bambuser' },
-    inputs: ['main'],
-    outputs: ['main'],
+    inputs: [NodeConnectionTypes.Main],
+    outputs: [NodeConnectionTypes.Main],
     credentials: [{ name: 'bambuserApi', required: true, testedBy: 'bambuserApiTest' }],
     properties: [
       {
@@ -139,7 +139,7 @@ export class Bambuser implements INodeType {
           requestOptions,
         ) ?? { success: true };
 
-        return { json: responseData as IDataObject };
+        return { json: responseData as IDataObject, pairedItem: { item: i } };
       }),
     );
 
