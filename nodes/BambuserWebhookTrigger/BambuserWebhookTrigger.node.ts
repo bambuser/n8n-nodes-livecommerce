@@ -54,7 +54,6 @@ export class BambuserWebhookTrigger implements INodeType {
         description: 'Label for the webhook registration in the Bambuser dashboard',
       },
     ],
-		usableAsTool: true,
   };
 
   webhookMethods = {
