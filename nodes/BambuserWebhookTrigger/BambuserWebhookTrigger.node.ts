@@ -6,6 +6,7 @@ import type {
   IWebhookFunctions,
   IWebhookResponseData,
 } from 'n8n-workflow';
+import { NodeConnectionTypes } from 'n8n-workflow';
 
 import { resolveOrigin } from '../../lib/resolveOrigin';
 
@@ -19,7 +20,7 @@ export class BambuserWebhookTrigger implements INodeType {
     description: 'Starts a workflow when Bambuser fires a webhook event. Registers the n8n URL with Bambuser on activation. Requires WRITE_WEBHOOKS scope. Note: deactivating the workflow does not remove the Bambuser subscription — delete it manually from the Bambuser dashboard.',
     defaults: { name: 'Bambuser Webhook Trigger' },
     inputs: [],
-    outputs: ['main'],
+    outputs: [NodeConnectionTypes.Main],
     credentials: [{ name: 'bambuserApi', required: true, testedBy: 'bambuserApiTest' }],
     webhooks: [
       {
