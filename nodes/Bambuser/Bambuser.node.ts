@@ -139,7 +139,7 @@ export class Bambuser implements INodeType {
           requestOptions,
         ) ?? { success: true };
 
-        return { json: responseData as IDataObject };
+        return { json: responseData as IDataObject, pairedItem: { item: i } };
       }),
     );
 

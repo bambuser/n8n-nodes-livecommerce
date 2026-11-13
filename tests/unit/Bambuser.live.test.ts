@@ -44,3 +44,41 @@ describe('Bambuser — live resources', () => {
     assert.equal(req.headers.authorization, 'Token test-key');
   });
 });
+
+describe('Bambuser — item linking', () => {
+  let server: Awaited<ReturnType<typeof startMockServer>>;
+
+  beforeEach(async () => {
+    server = await startMockServer();
+  });
+
+  afterEach(async () => {
+    await server.close();
+  });
+
+  // Rule: output item i links back to input item i.
+  const cases = [
+    { inputCount: 0, expected: [] },
+    { inputCount: 1, expected: [{ item: 0 }] },
+    { inputCount: 3, expected: [{ item: 0 }, { item: 1 }, { item: 2 }] },
+  ];
+
+  for (const { inputCount, expected } of cases) {
+    it(`${inputCount} input item(s) — pairedItem matches input index`, async () => {
+      server.on('GET', '/v1/shows', () => ({ body: showGetManyFixture }));
+
+      const ctx = buildExecuteContext({
+        credential: { apiKey: 'test-key', region: 'eu', baseUrl: server.url },
+        parameters: { resource: 'liveShow', operation: 'getMany', limit: 5 },
+        inputItems: Array.from({ length: inputCount }, () => ({ json: {} })),
+      });
+
+      const result = await new Bambuser().execute.call(ctx);
+
+      assert.deepEqual(
+        result[0].map((item) => item.pairedItem),
+        expected,
+      );
+    });
+  }
+});
