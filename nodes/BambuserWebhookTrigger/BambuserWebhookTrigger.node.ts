@@ -17,6 +17,7 @@ export class BambuserWebhookTrigger implements INodeType {
     icon: 'file:bambuser-webhook.svg',
     group: ['trigger'],
     version: 1,
+    subtitle: '={{$parameter["topics"].join(", ")}}',
     description: 'Starts a workflow when Bambuser fires a webhook event. Registers the n8n URL with Bambuser on activation. Requires WRITE_WEBHOOKS scope. Note: deactivating the workflow does not remove the Bambuser subscription — delete it manually from the Bambuser dashboard.',
     defaults: { name: 'Bambuser Webhook Trigger' },
     inputs: [],
