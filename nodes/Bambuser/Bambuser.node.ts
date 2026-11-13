@@ -40,7 +40,7 @@ export class Bambuser implements INodeType {
   description: INodeTypeDescription = {
     displayName: 'Bambuser',
     name: 'bambuser',
-    icon: 'file:bambuser.svg',
+    icon: { light: 'file:bambuser.svg', dark: 'file:bambuser.svg' },
     group: ['transform'],
     version: 1,
     subtitle: '={{$parameter["resource"] + ": " + $parameter["operation"]}}',

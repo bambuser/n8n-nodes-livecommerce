@@ -14,7 +14,10 @@ export class BambuserWebhookTrigger implements INodeType {
   description: INodeTypeDescription = {
     displayName: 'Bambuser Webhook Trigger',
     name: 'bambuserWebhookTrigger',
-    icon: 'file:bambuser-webhook.svg',
+    icon: {
+      light: 'file:bambuser-webhook.svg',
+      dark: 'file:bambuser-webhook.svg',
+    },
     group: ['trigger'],
     version: 1,
     subtitle: '={{$parameter["topics"].join(", ")}}',
